@@ -1,0 +1,11 @@
+services:
+  mysql-docker:
+    image: arm64v8/mysql
+    ports:
+      - "3306:3306"
+    environment:
+      TZ: Asia/Seoul
+    env_file: .env
+    container_name: "docker-mysql"
+    volumes:
+      - /Users/wool/Database-docker/data/mysql:/var/lib/mysql
