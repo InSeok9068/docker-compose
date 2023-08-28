@@ -1,9 +1,7 @@
 services:
   mongo-docker:
-    image: arm64v8/mongo
+    container_name: mongo-docker
+    image: mongo
     ports:
-      - "${MONGO_PORT}:27017"
+      - 27017:27017
     env_file: .env
-    container_name: "docker-mongodb"
-    volumes:
-      - /Users/wool/Database-docker/data/mongo:/data/db
