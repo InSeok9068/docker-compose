@@ -1,6 +1,6 @@
-# Docker-Compose-Sample
+# Docker-Compose
 
-도커 컴포즈 샘플 (ARM 기반 서버)
+도커 컴포즈 (ARM 기반 서버)
 
 도커 이미지 검색 : `arm64v8` prefix
 
