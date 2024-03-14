@@ -1,6 +1,0 @@
-services:
-  nginx-docker:
-    container_name: nginx-docker
-    image: nginx
-    ports:
-      - 80:80

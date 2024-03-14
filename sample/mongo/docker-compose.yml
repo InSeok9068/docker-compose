@@ -1,7 +1,0 @@
-services:
-  mongo-docker:
-    container_name: mongo-docker
-    image: mongo
-    ports:
-      - 27017:27017
-    env_file: .env

@@ -7,5 +7,3 @@
 ## 다른 이름의 도커 컴포즈 파일을 실행 시킬 때
 
 docker compose -f docker-compose-local.yml up
-
-## 로드 밸런싱

@@ -1,9 +1,0 @@
-services:
-  mysql-docker:
-    container_name: mysql-docker
-    image: mysql
-    ports:
-      - 3306:3306
-    environment:
-      TZ: Asia/Seoul
-    env_file: .env
