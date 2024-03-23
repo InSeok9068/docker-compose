@@ -4,6 +4,7 @@ services:
     image: nginx
     ports:
       - 80:80
+      - 443:443
 
   pocketbase:
     image: ghcr.io/muchobien/pocketbase:latest
