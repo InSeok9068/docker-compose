@@ -1,9 +1,9 @@
 services:
-  # nginx-docker:
-  #   container_name: nginx-docker
-  #   image: nginx
-  #   ports:
-  #     - 80:80
+  nginx-docker:
+    container_name: nginx-docker
+    image: nginx
+    ports:
+      - 80:80
 
   pocketbase:
     image: ghcr.io/muchobien/pocketbase:latest
@@ -15,7 +15,7 @@ services:
     # environment:
     #   ENCRYPTION: example #optional
     ports:
-      - "80:8090"
+      - "8090:8090"
     volumes:
       - /path/to/data:/pb_data
       - /path/to/public:/pb_public #optional
