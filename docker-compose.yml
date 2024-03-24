@@ -4,7 +4,6 @@ services:
     image: nginx
     ports:
       - 80:80
-      - 443:443
 
   pocketbase:
     image: ghcr.io/muchobien/pocketbase:latest
@@ -16,7 +15,7 @@ services:
     # environment:
     #   ENCRYPTION: example #optional
     ports:
-      - "8090:8090"
+      - 8090:8090
     volumes:
       - /path/to/data:/pb_data
       - /path/to/public:/pb_public #optional
