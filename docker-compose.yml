@@ -1,42 +1,53 @@
 services:
-  nginx-docker:
-    container_name: nginx-docker
+  nginx:
     image: nginx
+    container_name: nginx
+    restart: unless-stopped
     ports:
       - 80:80
+      - 443:443
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/nginx.conf
+      - ./data/certbot/conf:/etc/letsencrypt 
+      - ./data/certbot/www:/var/www/certbot      
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"      
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    restart: unless-stopped
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt 
+      - ./data/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"      
 
   pocketbase:
     image: ghcr.io/muchobien/pocketbase:latest
-    container_name: pocketbase-docker
+    container_name: pocketbase
     restart: unless-stopped
-    # command:
-    #   - --encryptionEnv #optional
-    #   - ENCRYPTION #optional
-    # environment:
-    #   ENCRYPTION: example #optional
     ports:
       - 8090:8090
     volumes:
       - /path/to/data:/pb_data
-      - /path/to/public:/pb_public #optional
-      - /path/to/hooks:/pb_hooks #optional
-    healthcheck: #optional (recommended) since v0.10.0
+      - /path/to/public:/pb_public
+      - /path/to/hooks:/pb_hooks
+    healthcheck:
       test: wget --no-verbose --tries=1 --spider http://localhost:8090/api/health || exit 1
       interval: 5s
       timeout: 5s
       retries: 5
 
-  redis-docker:
-    container_name: redis-docker
+  redis:
+    container_name: redis
     image: redis:alpine
     ports:
       - 6379:6379
     volumes:
       - ./app/redis/data:/data
 
-  portainer-docker:
+  portainer:
     image: portainer/portainer-ce:alpine
-    container_name: portainer-docker
+    container_name: portainer
     ports:
       - 8888:9000
     volumes:
