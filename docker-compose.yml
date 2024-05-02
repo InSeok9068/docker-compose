@@ -53,3 +53,11 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./app/portainer/data:/data
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - 11434:11434
+    volumes:
+      - ./app/ollama:/root/.ollama
