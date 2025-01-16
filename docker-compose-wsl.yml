@@ -4,7 +4,7 @@ services:
     container_name: prometheus
     image: prom/prometheus
     ports:
-      - "9090:9090"
+      - 9090:9090
     volumes:
       - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./app/prometheus:/prometheus
@@ -14,7 +14,7 @@ services:
     container_name: grafana
     image: grafana/grafana
     ports:
-      - "3000:3000"
+      - 3000:3000
     depends_on:
       - prometheus
     volumes:
@@ -57,7 +57,7 @@ services:
     container_name: open-webui
     image: ghcr.io/open-webui/open-webui
     ports:
-      - "8282:8080"
+      - 8282:8080
     volumes:
       - ./app/open-webui:/app/backend/data
     extra_hosts:
