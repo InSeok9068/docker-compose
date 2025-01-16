@@ -26,3 +26,18 @@ newgrp docker
 ```shell
 curl -sSL get.docker.com | sh
 ```
+
+## 서비스별 목록
+
+| 서비스 명     | 포트 번호 | alpine 버전 |
+| ------------- | --------- | ----------- |
+| nginx         | 80, 443   | O           |
+| prometheus    | 9090      | X           |
+| grafana       | 3000      | X           |
+| ollama        | 11434     | X           |
+| open-webui    | 8282:8080 | X           |
+| portainer     | 8888:9000 | O           |
+| elasticsearch | 9200      | X           |
+| kibana        | 5601      | X           |
+| apm-server    | 8200      | X           |
+| redis         | 6379      | O           |

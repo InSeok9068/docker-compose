@@ -58,6 +58,8 @@ services:
     image: ghcr.io/open-webui/open-webui
     ports:
       - 8282:8080
+    depends_on:
+      - ollama
     volumes:
       - ./app/open-webui:/app/backend/data
     extra_hosts:
