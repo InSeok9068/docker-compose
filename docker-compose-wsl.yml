@@ -22,28 +22,16 @@ services:
     volumes:
       - ./app/grafana:/var/lib/grafana
 
-  # elasticsearch:
-  #   container_name: elasticsearch
-  #   image: docker.elastic.co/elasticsearch/elasticsearch
-  #   ports:
-  #     - 9200:9200
-
-  # kibana:
-  #   container_name: kibana
-  #   image: docker.elastic.co/kibana/kibana
-  #   ports:
-  #     - 5601:5601
-  #   depends_on:
-  #     - elasticsearch
-
-  # apm-server:
-  #   container_name: apm-server
-  #   image: docker.elastic.co/apm/apm-server
-  #   ports:
-  #     - 8200:8200
-  #   depends_on:
-  #     - elasticsearch
-  #     - kibana
+  # 모니터링 툴
+  loki:
+    container_name: grafana
+    image: grafana/loki
+    ports:
+      - 3100:3100
+    depends_on:
+      - grafana
+    volumes:
+      - ./config/loki.yml:/etc/loki/local-config.yaml
 
   # AI 모델 서버
   ollama:
