@@ -12,4 +12,17 @@
 
 ## 다른 이름의 도커 컴포즈 파일을 실행 시킬 때
 
-docker compose -f docker-compose-local.yml up
+docker compose -f docker-compose-wsl.yml up
+
+## 도커 사용자 권한 부여
+
+```shell
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+## WSL 도커 CLI 설치
+
+```shell
+curl -sSL get.docker.com | sh
+```

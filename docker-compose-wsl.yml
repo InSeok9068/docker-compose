@@ -1,10 +1,64 @@
 services:
+  # 시계열 데이터베이스
   prometheus:
+    container_name: prometheus
     image: prom/prometheus
     ports:
       - "9090:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./app/prometheus:/prometheus
 
+  # 모니터링 툴
   grafana:
+    container_name: grafana
     image: grafana/grafana
     ports:
       - "3000:3000"
+    depends_on:
+      - prometheus
+    volumes:
+      - ./app/grafana/lib:/var/lib/grafana
+
+  # elasticsearch:
+  #   container_name: elasticsearch
+  #   image: docker.elastic.co/elasticsearch/elasticsearch
+  #   ports:
+  #     - 9200:9200
+
+  # kibana:
+  #   container_name: kibana
+  #   image: docker.elastic.co/kibana/kibana
+  #   ports:
+  #     - 5601:5601
+  #   depends_on:
+  #     - elasticsearch
+
+  # apm-server:
+  #   container_name: apm-server
+  #   image: docker.elastic.co/apm/apm-server
+  #   ports:
+  #     - 8200:8200
+  #   depends_on:
+  #     - elasticsearch
+  #     - kibana
+
+  # AI 모델 서버
+  ollama:
+    container_name: ollama
+    image: ollama/ollama
+    ports:
+      - 11434:11434
+    volumes:
+      - ./app/ollama:/root/.ollama
+
+  # AI 모델 WEB UI
+  open-webui:
+    container_name: open-webui
+    image: ghcr.io/open-webui/open-webui
+    ports:
+      - "8282:8080"
+    volumes:
+      - ./app/open-webui:/app/backend/data
+    extra_hosts:
+      - host.docker.internal:host-gateway
