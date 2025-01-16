@@ -3,6 +3,7 @@ services:
   prometheus:
     container_name: prometheus
     image: prom/prometheus
+    user: 1000:1000
     ports:
       - 9090:9090
     volumes:
@@ -13,12 +14,13 @@ services:
   grafana:
     container_name: grafana
     image: grafana/grafana
+    user: 1000:1000
     ports:
       - 3000:3000
     depends_on:
       - prometheus
     volumes:
-      - ./app/grafana/lib:/var/lib/grafana
+      - ./app/grafana:/var/lib/grafana
 
   # elasticsearch:
   #   container_name: elasticsearch
