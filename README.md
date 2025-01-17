@@ -74,4 +74,5 @@ curl -sSL get.docker.com | sh
 | portainer  | 8888:9000 | 컨테이너 관리 도구   | O           |
 | redis      | 6379      | 캐시 데이터베이스    | O           |
 | certbot    | x         | SSL 인증서 발급/갱신 | X           |
+| jaeger     | 다량      | Jaeger 트레이싱      | X           |
 | pocketbase | 8090      | 포켓베이스(BaaS)     | X           |
