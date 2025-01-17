@@ -21,6 +21,14 @@ sudo usermod -aG docker $USER
 newgrp docker
 ```
 
+## 폴더 권한 부여
+
+```shell
+chmod -R 777 ./app/prometheus
+chmod -R 777 ./app/grafana
+chmod -R 777 ./app/loki
+```
+
 ## WSL 도커 CLI 설치
 
 ```shell
@@ -34,6 +42,8 @@ curl -sSL get.docker.com | sh
 | nginx      | 80, 443   | O           |
 | prometheus | 9090      | X           |
 | grafana    | 3000      | X           |
+| loki       | 3100      | X           |
+| promtail   | X         | X           |
 | ollama     | 11434     | X           |
 | open-webui | 8282:8080 | X           |
 | portainer  | 8888:9000 | O           |

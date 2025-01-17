@@ -3,18 +3,16 @@ services:
   prometheus:
     container_name: prometheus
     image: prom/prometheus
-    user: 1000:1000
     ports:
       - 9090:9090
     volumes:
-      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./app/prometheus:/prometheus
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
 
-  # 모니터링 툴
+  # 데이터 시각화 도구
   grafana:
     container_name: grafana
     image: grafana/grafana
-    user: 1000:1000
     ports:
       - 3000:3000
     depends_on:
@@ -22,35 +20,48 @@ services:
     volumes:
       - ./app/grafana:/var/lib/grafana
 
-  # 모니터링 툴
+  # 로그 수집 서버
   loki:
-    container_name: grafana
+    container_name: loki
     image: grafana/loki
     ports:
       - 3100:3100
     depends_on:
       - grafana
     volumes:
-      - ./config/loki.yml:/etc/loki/local-config.yaml
+      - ./app/loki:/loki
+    #   - ./config/loki.yml:/etc/loki/loki.yml
+    # command: -config.file=/etc/loki/loki.yml
 
-  # AI 모델 서버
-  ollama:
-    container_name: ollama
-    image: ollama/ollama
-    ports:
-      - 11434:11434
-    volumes:
-      - ./app/ollama:/root/.ollama
-
-  # AI 모델 WEB UI
-  open-webui:
-    container_name: open-webui
-    image: ghcr.io/open-webui/open-webui
-    ports:
-      - 8282:8080
+  # 로그 전달 도구
+  promtail:
+    container_name: promtail
+    image: grafana/promtail
     depends_on:
-      - ollama
+      - loki
     volumes:
-      - ./app/open-webui:/app/backend/data
-    extra_hosts:
-      - host.docker.internal:host-gateway
+      - /var/log:/var/log
+      - ./config/promtail.yml:/etc/promtail/promtail.yml
+    command: -config.file=/etc/promtail/promtail.yml
+
+  # # AI 모델 서버
+  # ollama:
+  #   container_name: ollama
+  #   image: ollama/ollama
+  #   ports:
+  #     - 11434:11434
+  #   volumes:
+  #     - ./app/ollama:/root/.ollama
+
+  # # AI 모델 WEB UI
+  # open-webui:
+  #   container_name: open-webui
+  #   image: ghcr.io/open-webui/open-webui
+  #   ports:
+  #     - 8282:8080
+  #   depends_on:
+  #     - ollama
+  #   volumes:
+  #     - ./app/open-webui:/app/backend/data
+  #   extra_hosts:
+  #     - host.docker.internal:host-gateway
