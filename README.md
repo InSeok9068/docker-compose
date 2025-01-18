@@ -10,6 +10,9 @@
 - 폴더 권한 부여
 
 ```shell
+# 폴더 생성
+mkdir ./app/{grafana,loki,redis,ollama,portainer,open-webui,prometheus}
+
 # 모두
 chmod -R 777 ./app
 
