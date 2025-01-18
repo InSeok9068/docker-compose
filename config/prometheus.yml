@@ -5,6 +5,7 @@ scrape_configs:
   - job_name: "go-server"
     scrape_interval: 5s
     metrics_path: "/metrics"
+    scheme: https
     static_configs:
       # - targets: ["172.22.160.1:8000"] # 집 PC
       # - targets: ["172.22.160.1:8000"] # 회사 PC
