@@ -9,4 +9,4 @@ scrape_configs:
     static_configs:
       # - targets: ["172.22.160.1:8000"] # 집 PC
       # - targets: ["172.22.160.1:8000"] # 회사 PC
-      - targets: ["146.56.174.134"] # Go 서버
+      - targets: ["toy-project.n-e.kr"] # Go 서버
