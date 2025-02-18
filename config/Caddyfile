@@ -1,0 +1,25 @@
+{
+    # 전역 설정
+    email dlstjr9068@gmail.com  # Let's Encrypt SSL 인증서 발급을 위한 이메일 설정
+}
+
+# 기본 도메인 (HTTPS 자동 적용)
+development-support.o-r.kr {
+    reverse_proxy pocketbase:8090
+}
+
+portainer.development-support.o-r.kr {
+    reverse_proxy portainer:9000
+}
+
+grafana.development-support.o-r.kr {
+    reverse_proxy grafana:3000
+}
+
+prometheus.development-support.o-r.kr {
+    reverse_proxy prometheus:9090
+}
+
+open-webui.development-support.o-r.kr {
+    reverse_proxy open-webui:8080
+}
