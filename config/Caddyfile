@@ -23,3 +23,7 @@ prometheus.development-support.o-r.kr {
 open-webui.development-support.o-r.kr {
     reverse_proxy open-webui:8080
 }
+
+squash-helper.development-support.o-r.kr {
+    reverse_proxy squash-helper:8080
+}
