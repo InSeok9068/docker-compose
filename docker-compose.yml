@@ -120,3 +120,10 @@ services:
       - host.docker.internal:host-gateway
     environment:
       - OLLAMA_BASE_URL=http://ollama:11434
+
+  # squash-helper:
+  #   container_name: squash-helper
+  #   image: ghcr.io/dlstj/squash-helper:release
+  #   restart: unless-stopped
+  #   ports:
+  #     - 8080:8080
