@@ -132,6 +132,7 @@ services:
       UPTRACE_SKIP_CONFIG: "true"
     volumes:
       - ./app/uptrace:/var/lib/uptrace # (선택) 데이터 영속화
+      - ./config/uptrace.yml:/etc/uptrace/config.yml
 
   squash-helper:
     container_name: squash-helper
