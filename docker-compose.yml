@@ -121,19 +121,6 @@ services:
     environment:
       - OLLAMA_BASE_URL=http://ollama:11434
 
-  uptrace:
-    container_name: uptrace
-    image: uptrace/uptrace:latest
-    restart: unless-stopped
-    ports:
-      - 14318:14318 # Web UI 및 OTLP 포트
-      - 4317:4317 # OTLP gRPC (Go SDK가 기본으로 이 포트 사용)
-    environment:
-      UPTRACE_SKIP_CONFIG: "true"
-    volumes:
-      - ./app/uptrace:/var/lib/uptrace # (선택) 데이터 영속화
-      - ./config/uptrace.yml:/etc/uptrace/config.yml
-
   squash-helper:
     container_name: squash-helper
     image: ghcr.io/inseok9068/squash-helper:release

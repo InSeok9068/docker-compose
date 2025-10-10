@@ -27,7 +27,3 @@ open-webui.development-support.o-r.kr {
 squash-helper.development-support.o-r.kr {
     reverse_proxy squash-helper:8080
 }
-
-uptrace.development-support.o-r.kr {
-    reverse_proxy uptrace:14318
-}
