@@ -1,0 +1,5 @@
+service:
+  env: dev
+
+sqlite:
+  file: /var/lib/uptrace/uptrace.db
