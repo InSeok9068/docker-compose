@@ -121,6 +121,7 @@ services:
     environment:
       - OLLAMA_BASE_URL=http://ollama:11434
 
+  # Squash Helper
   squash-helper:
     container_name: squash-helper
     image: ghcr.io/inseok9068/squash-helper:release
