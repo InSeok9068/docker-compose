@@ -41,6 +41,8 @@ services:
       - /path/to/todo/data:/pb_data
       - /path/to/todo/public:/pb_public
       - /path/to/todo/hooks:/pb_hooks
+      # ✅ (옵션) 마이그레이션 파일 read-only 마운트
+      # - ./migrations/todo:/pb_migrations:ro
     healthcheck:
       test:
         [
