@@ -24,9 +24,9 @@ services:
     ports:
       - 8090:8090
     volumes:
-      - /path/to/data:/pb_data
-      - /path/to/public:/pb_public
-      - /path/to/hooks:/pb_hooks
+      - /path/to/todo/data:/pb_data
+      - /path/to/todo/public:/pb_public
+      - /path/to/todo/hooks:/pb_hooks
     healthcheck:
       test: wget --no-verbose --tries=1 --spider http://localhost:8090/api/health || exit 1
       interval: 5s
