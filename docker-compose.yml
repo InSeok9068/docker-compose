@@ -1,5 +1,4 @@
-# ports 외부:내부
-# volumes PC:도커
+version: "3.9"
 
 services:
   caddy:
@@ -7,29 +6,37 @@ services:
     container_name: caddy
     restart: unless-stopped
     ports:
-      - 80:80
-      - 443:443
+      - "80:80"
+      - "443:443"
     volumes:
       - ./app/caddy:/data
-      - ./config/Caddyfile:/etc/caddy/Caddyfile
+      - ./config/Caddyfile:/etc/caddy/Caddyfile:ro
     depends_on:
       - todo-pocketbase
       - squash-helper
       - portainer
+    networks:
+      - public
+      - private
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   todo-pocketbase:
     image: ghcr.io/muchobien/pocketbase:latest
     container_name: todo-pocketbase
     restart: unless-stopped
     environment:
-      # Optional: Configure host and port (defaults: 0.0.0.0:8090)
       PB_HOST: 0.0.0.0
       PB_PORT: 8090
-      # 초기 업로드 시 관리자 계정 생성 이후 주석 처리 필수 !
-      #PB_ADMIN_EMAIL: [EMAIL_ADDRESS]
-      #PB_ADMIN_PASSWORD: [PASSWORD]
-    ports:
-      - 8090:8090
+      # 초기 1회만 사용 후 제거 권장
+      #PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
+      #PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
+    # ✅ 외부에 포트 공개하지 않음 (Caddy가 내부로 프록시)
+    expose:
+      - "8090"
     volumes:
       - /path/to/todo/data:/pb_data
       - /path/to/todo/public:/pb_public
@@ -48,20 +55,48 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+    networks:
+      - private
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
+  # ✅ Portainer: 외부 포트 제거하고 내부에서만 접근 (Caddy 통해 접근하게 만들 예정)
   portainer:
     image: portainer/portainer-ce:alpine
     container_name: portainer
-    ports:
-      - 8888:9000
+    restart: unless-stopped
+    expose:
+      - "9000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./app/portainer/data:/data
+    networks:
+      - private
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
-  # Squash Helper
   squash-helper:
     container_name: squash-helper
     image: ghcr.io/inseok9068/squash-helper:release
     restart: unless-stopped
-    ports:
-      - 8080:8080
+    # ✅ 외부 포트 공개하지 않음 (Caddy가 내부로 프록시)
+    expose:
+      - "8080"
+    networks:
+      - private
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+networks:
+  public:
+  private:
+    internal: true
