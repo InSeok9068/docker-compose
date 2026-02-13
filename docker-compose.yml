@@ -13,7 +13,8 @@ services:
       - ./app/caddy:/data
       - ./config/Caddyfile:/etc/caddy/Caddyfile
     depends_on:
-      - pocketbase
+      - todo-pocketbase
+      - squash-helper
       - portainer
 
   todo-pocketbase:
