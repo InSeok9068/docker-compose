@@ -13,6 +13,7 @@ services:
       - ./config/Caddyfile:/etc/caddy/Caddyfile:ro
     depends_on:
       - todo-pocketbase
+      - kjca-pocketbase
       - squash-helper
       - portainer
     networks:
