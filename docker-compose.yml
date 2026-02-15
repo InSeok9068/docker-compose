@@ -78,7 +78,7 @@ services:
       GEMINI_API_KEY: ${GEMINI_API_KEY:?set GEMINI_API_KEY}
       # 초기 1회만 사용 후 제거 권장
       PB_ADMIN_EMAIL: dlstjr9068@gmail.com
-      PB_ADMIN_PASSWORD: admin
+      PB_ADMIN_PASSWORD: dlstjr9068@gmail.com
     # ✅ 외부에 포트 공개하지 않음 (Caddy가 내부로 프록시)
     expose:
       - "8090"
