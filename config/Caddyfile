@@ -8,6 +8,10 @@ development-support.o-r.kr {
     reverse_proxy todo-pocketbase:8090
 }
 
+kjca.development-support.o-r.kr {
+    reverse_proxy kjca-pocketbase:8090
+}
+
 portainer.development-support.o-r.kr {
     reverse_proxy portainer:9000
 }
