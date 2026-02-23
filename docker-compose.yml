@@ -15,7 +15,6 @@ services:
       - todo-pocketbase
       - kjca-pocketbase
       - squash-helper
-      - portainer
     networks:
       - public
       - private
@@ -107,24 +106,6 @@ services:
     networks:
       - private
       - egress
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
-
-  # ✅ Portainer: 외부 포트 제거하고 내부에서만 접근 (Caddy 통해 접근하게 만들 예정)
-  portainer:
-    image: portainer/portainer-ce:alpine
-    container_name: portainer
-    restart: unless-stopped
-    expose:
-      - "9000"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./app/portainer/data:/data
-    networks:
-      - private
     logging:
       driver: "json-file"
       options:

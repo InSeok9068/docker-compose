@@ -12,10 +12,6 @@ kjca.development-support.o-r.kr {
     reverse_proxy kjca-pocketbase:8090
 }
 
-portainer.development-support.o-r.kr {
-    reverse_proxy portainer:9000
-}
-
 squash-helper.development-support.o-r.kr {
     reverse_proxy squash-helper:8080
 }
