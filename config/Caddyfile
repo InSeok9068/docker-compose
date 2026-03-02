@@ -12,6 +12,10 @@ kjca.development-support.o-r.kr {
     reverse_proxy kjca-pocketbase:8090
 }
 
+.stylemate.development-support.o-r.kr {
+    reverse_proxy stylemate-pocketbase:8090
+}
+
 squash-helper.development-support.o-r.kr {
     reverse_proxy squash-helper:8080
 }
