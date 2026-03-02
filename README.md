@@ -10,6 +10,13 @@
 docker system prune -a
 ```
 
+## /path/to/{service} 배포 권한 부여
+
+```shell
+sudo chown -R ubuntu:ubuntu /path/to/stylemate
+sudo chmod -R 755 /path/to/stylemate
+```
+
 ## 도커 컴포즈 명령어
 
 ### 도커 서버
