@@ -123,8 +123,8 @@ services:
       # 서버 환경변수(또는 .env)에서 주입. 미설정이면 compose가 에러로 중단함.
       GEMINI_API_KEY: ${GEMINI_API_KEY:?set GEMINI_API_KEY}
       # 초기 1회만 사용 후 제거 권장
-      PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
-      PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
+      # PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
+      # PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
     # ✅ 외부에 포트 공개하지 않음 (Caddy가 내부로 프록시)
     expose:
       - "8090"
