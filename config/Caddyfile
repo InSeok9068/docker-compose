@@ -19,3 +19,7 @@ stylemate.development-support.o-r.kr {
 squash-helper.development-support.o-r.kr {
     reverse_proxy squash-helper:8080
 }
+
+sample.development-support.o-r.kr {
+    reverse_proxy sample-pocketpages:8090
+}
