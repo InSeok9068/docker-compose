@@ -15,6 +15,7 @@ services:
       - todo-pocketbase
       - kjca-pocketbase
       - stylemate-pocketbase
+      - sample-pocketpages
       - squash-helper
     networks:
       - public
