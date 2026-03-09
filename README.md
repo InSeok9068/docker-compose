@@ -23,7 +23,15 @@ sudo chown -R ubuntu:ubuntu /path/to/stylemate
 sudo chmod -R 755 /path/to/stylemate
 ```
 
-## 도커 마운트 꼬여있을때 재정리
+## 도커 볼륨 마운트 꼬여있을때 재정리
+
+### 도커 볼륨 마운트 정리
+
+```shell
+docker compose down kjca-pocketpages -v
+```
+
+### 폴더 강제 삭제
 
 ```shell
 docker compose stop kjca-pocketpages
