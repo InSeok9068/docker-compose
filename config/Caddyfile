@@ -8,16 +8,16 @@ development-support.o-r.kr {
     reverse_proxy todo-pocketbase:8090
 }
 
-kjca.development-support.o-r.kr {
-    reverse_proxy kjca-pocketbase:8090
-}
-
 stylemate.development-support.o-r.kr {
     reverse_proxy stylemate-pocketbase:8090
 }
 
 squash-helper.development-support.o-r.kr {
     reverse_proxy squash-helper:8080
+}
+
+kjca.development-support.o-r.kr {
+    reverse_proxy kjca-pocketpages:8090
 }
 
 sample.development-support.o-r.kr {
