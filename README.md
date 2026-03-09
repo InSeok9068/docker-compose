@@ -10,6 +10,12 @@
 docker system prune -a
 ```
 
+## 도커 컴포즈에 정의되지 않는 서비스 제외
+
+```shell
+docker compose up -d --remove-orphans
+```
+
 ## /path/to/{service} 배포 권한 부여
 
 ```shell
