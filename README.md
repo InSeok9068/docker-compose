@@ -23,37 +23,12 @@ sudo chown -R ubuntu:ubuntu /path/to/stylemate
 sudo chmod -R 755 /path/to/stylemate
 ```
 
-## 도커 컴포즈 명령어
-
-### 도커 서버
+## 도커 마운트 꼬여있을때 재정리
 
 ```shell
-# 실행
-# -d 백그라운드 실행
-docker compose up
-# 중지
-docker compose down
-# 이미지 최신 다운로드
-docker compose pull
-```
-
-### WSL 서버
-
-```shell
-# 실행
-# -d 백그라운드 실행
-docker compose -f docker-compose-wsl.yml up
-# 중지
-docker compose down
-# 이미지 최신 다운로드
-docker compose -f docker-compose-wsl.yml pull
-```
-
-## 도커 사용자 권한 부여
-
-```shell
-sudo usermod -aG docker $USER
-newgrp docker
+docker compose stop kjca-pocketpages
+find /path/to/kjca/hooks -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+docker compose up -d --force-recreate kjca-pocketpages
 ```
 
 ## WSL 도커 CLI 설치
