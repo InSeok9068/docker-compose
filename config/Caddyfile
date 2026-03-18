@@ -23,3 +23,7 @@ kjca.development-support.o-r.kr {
 sample.development-support.o-r.kr {
     reverse_proxy sample-pocketpages:8090
 }
+
+booklog.development-support.o-r.kr {
+    reverse_proxy booklog-pocketpages:8090
+}
