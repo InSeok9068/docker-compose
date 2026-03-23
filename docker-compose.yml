@@ -197,7 +197,6 @@ services:
     container_name: booklog-pocketpages
     restart: unless-stopped
     environment:
-      TZ: Asia/Seoul
       # GEMINI_API_KEY: ${GEMINI_API_KEY:?set GEMINI_API_KEY}
       DATA4LIBRARY_APIKEY: ${DATA4LIBRARY_APIKEY:?set DATA4LIBRARY_APIKEY}
       ONESIGNAL_APPID: ${ONESIGNAL_APPID:?set ONESIGNAL_APPID}
