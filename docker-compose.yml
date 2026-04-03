@@ -207,9 +207,9 @@ services:
     expose:
       - "8090"
     volumes:
-      - /path/to/booklog/data:/workspace/apps/booklog/pb_data
-      - /path/to/booklog/public:/workspace/apps/booklog/pb_public
-      - /path/to/booklog/hooks:/workspace/apps/booklog/pb_hooks
+      - /path/to/booklog/data:/app/pb_data
+      - /path/to/booklog/public:/app/pb_public
+      - /path/to/booklog/hooks:/app/pb_hooks
       # ✅ (옵션) 마이그레이션 파일 read-only 마운트
       # - /path/to/booklog/migrations:/app/pb_migrations:ro
     healthcheck:
