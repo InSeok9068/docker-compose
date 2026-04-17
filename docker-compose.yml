@@ -36,7 +36,7 @@ services:
       # 초기 1회만 사용 후 제거 권장
       #PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
       #PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
-    # ✅ 외부에 포트 공개하지 않음 (Caddy가 내부로 프록시)
+      # ✅ 외부에 포트 공개하지 않음 (Caddy가 내부로 프록시)
     expose:
       - "8090"
     volumes:
@@ -80,7 +80,7 @@ services:
       # 초기 1회만 사용 후 제거 권장
       # PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
       # PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
-    # ✅ 외부에 포트 공개하지 않음 (Caddy가 내부로 프록시)
+      # ✅ 외부에 포트 공개하지 않음 (Caddy가 내부로 프록시)
     expose:
       - "8090"
     volumes:
@@ -212,6 +212,47 @@ services:
       - /path/to/booklog/hooks:/app/apps/booklog/pb_hooks
       # ✅ (옵션) 마이그레이션 파일 read-only 마운트
       # - /path/to/booklog/migrations:/app/apps/booklog/pb_migrations:ro
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:8090/api/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - private
+      - egress
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  photofolio-pocketpages:
+    image: ghcr.io/inseok9068/photofolio:release
+    container_name: photofolio-pocketpages
+    restart: unless-stopped
+    environment:
+      GEMINI_API_KEY: ${GEMINI_API_KEY:?set GEMINI_API_KEY}
+      FRED_APIKEY: ${FRED_APIKEY:?set FRED_APIKEY}
+      # 초기 1회만 사용 후 제거 권장
+      PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
+      PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
+    expose:
+      - "8090"
+    volumes:
+      - /path/to/photofolio/data:/app/pb_data
+      - /path/to/photofolio/public:/app/pb_public
+      - /path/to/photofolio/hooks:/app/pb_hooks
+      # ✅ (옵션) 마이그레이션 파일 read-only 마운트
+      # - /path/to/photofolio/migrations:/app/pb_migrations:ro
     healthcheck:
       test:
         [

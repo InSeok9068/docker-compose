@@ -27,3 +27,7 @@ sample.development-support.o-r.kr {
 booklog.development-support.o-r.kr {
     reverse_proxy booklog-pocketpages:8090
 }
+
+photofolio.development-support.o-r.kr {
+    reverse_proxy photofolio-pocketpages:8090
+}
