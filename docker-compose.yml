@@ -248,11 +248,11 @@ services:
     expose:
       - "8090"
     volumes:
-      - /path/to/photofolio/data:/app/pb_data
-      - /path/to/photofolio/public:/app/pb_public
-      - /path/to/photofolio/hooks:/app/pb_hooks
+      - /path/to/photofolio/data:/app/apps/photofolio/pb_data
+      - /path/to/photofolio/public:/app/apps/photofolio/pb_public
+      - /path/to/photofolio/hooks:/app/apps/photofolio/pb_hooks
       # ✅ (옵션) 마이그레이션 파일 read-only 마운트
-      # - /path/to/photofolio/migrations:/app/pb_migrations:ro
+      # - /path/to/photofolio/migrations:/app/apps/photofolio/pb_migrations:ro
     healthcheck:
       test:
         [
