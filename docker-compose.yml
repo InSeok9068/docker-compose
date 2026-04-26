@@ -243,8 +243,8 @@ services:
       GEMINI_API_KEY: ${GEMINI_API_KEY:?set GEMINI_API_KEY}
       FRED_APIKEY: ${FRED_APIKEY:?set FRED_APIKEY}
       # 초기 1회만 사용 후 제거 권장
-      PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
-      PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
+      # PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
+      # PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
     expose:
       - "8090"
     volumes:
@@ -253,6 +253,46 @@ services:
       - /path/to/photofolio/hooks:/app/apps/photofolio/pb_hooks
       # ✅ (옵션) 마이그레이션 파일 read-only 마운트
       # - /path/to/photofolio/migrations:/app/apps/photofolio/pb_migrations:ro
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:8090/api/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - private
+      - egress
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  homeping-pocketpages:
+    image: ghcr.io/inseok9068/homeping:release
+    container_name: homeping-pocketpages
+    restart: unless-stopped
+    environment:
+      DATAGOKR_APIKEY: ${DATAGOKR_APIKEY:?set DATAGOKR_APIKEY}
+      # 초기 1회만 사용 후 제거 권장
+      PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
+      PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
+    expose:
+      - "8090"
+    volumes:
+      - /path/to/homeping/data:/app/apps/homeping/pb_data
+      - /path/to/homeping/public:/app/apps/homeping/pb_public
+      - /path/to/homeping/hooks:/app/apps/homeping/pb_hooks
+      # ✅ (옵션) 마이그레이션 파일 read-only 마운트
+      # - /path/to/homeping/migrations:/app/apps/homeping/pb_migrations:ro
     healthcheck:
       test:
         [

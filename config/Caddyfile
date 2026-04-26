@@ -31,3 +31,7 @@ booklog.development-support.o-r.kr {
 photofolio.development-support.o-r.kr {
     reverse_proxy photofolio-pocketpages:8090
 }
+
+homeping.development-support.o-r.kr {
+    reverse_proxy homeping-pocketpages:8090
+}
