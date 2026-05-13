@@ -118,6 +118,7 @@ services:
     restart: unless-stopped
     stop_grace_period: 30s
     environment:
+      APP_ENV: production
       GEMINI_API_KEY: ${GEMINI_API_KEY:?set GEMINI_API_KEY}
       # 초기 1회만 사용 후 제거 권장
       # PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
@@ -159,6 +160,7 @@ services:
     restart: unless-stopped
     stop_grace_period: 30s
     environment:
+      APP_ENV: production
       GEMINI_API_KEY: ${GEMINI_API_KEY:?set GEMINI_API_KEY}
       # 초기 1회만 사용 후 제거 권장
       # PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
@@ -200,6 +202,7 @@ services:
     restart: unless-stopped
     stop_grace_period: 30s
     environment:
+      APP_ENV: production
       # GEMINI_API_KEY: ${GEMINI_API_KEY:?set GEMINI_API_KEY}
       DATA4LIBRARY_APIKEY: ${DATA4LIBRARY_APIKEY:?set DATA4LIBRARY_APIKEY}
       ONESIGNAL_APPID: ${ONESIGNAL_APPID:?set ONESIGNAL_APPID}
@@ -244,6 +247,7 @@ services:
     restart: unless-stopped
     stop_grace_period: 30s
     environment:
+      APP_ENV: production
       GEMINI_API_KEY: ${GEMINI_API_KEY:?set GEMINI_API_KEY}
       FRED_APIKEY: ${FRED_APIKEY:?set FRED_APIKEY}
       # 초기 1회만 사용 후 제거 권장
@@ -286,6 +290,7 @@ services:
     restart: unless-stopped
     stop_grace_period: 30s
     environment:
+      APP_ENV: production
       DATAGOKR_APIKEY: ${DATAGOKR_APIKEY:?set DATAGOKR_APIKEY}
       HOMEPING_ONESIGNAL_APIKEY: ${HOMEPING_ONESIGNAL_APIKEY:?set HOMEPING_ONESIGNAL_APIKEY}
       HOMEPING_ONESIGNAL_APPID: ${HOMEPING_ONESIGNAL_APPID:?set HOMEPING_ONESIGNAL_APPID}
