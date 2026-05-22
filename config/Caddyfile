@@ -35,3 +35,7 @@ photofolio.development-support.o-r.kr {
 homeping.development-support.o-r.kr {
     reverse_proxy homeping-pocketpages:8090
 }
+
+anchor.development-support.o-r.kr {
+    reverse_proxy anchor-pocketpages:8090
+}
