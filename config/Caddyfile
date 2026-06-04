@@ -39,3 +39,7 @@ homeping.development-support.o-r.kr {
 anchor.development-support.o-r.kr {
     reverse_proxy anchor-pocketpages:8090
 }
+
+launchboard.development-support.o-r.kr {
+    reverse_proxy launchboard-pocketpages:8090
+}

@@ -260,6 +260,33 @@ services:
         max-size: "10m"
         max-file: "5"
 
+  launchboard-pocketpages:
+    image: ghcr.io/inseok9068/launchboard:release
+    container_name: launchboard-pocketpages
+    restart: unless-stopped
+    stop_grace_period: 30s
+    environment:
+      APP_ENV: production
+      # 초기 1회만 사용 후 제거 권장
+      PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
+      PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
+    expose:
+      - "8090"
+    volumes:
+      - /path/to/launchboard/data:/app/apps/launchboard/pb_data
+      - /path/to/launchboard/public:/app/apps/launchboard/pb_public
+      - /path/to/launchboard/hooks:/app/apps/launchboard/pb_hooks
+      # ✅ (옵션) 마이그레이션 파일 read-only 마운트
+      # - /path/to/launchboard/migrations:/app/apps/launchboard/pb_migrations:ro
+    networks:
+      - private
+      - egress
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
   squash-helper:
     container_name: squash-helper
     image: ghcr.io/inseok9068/squash-helper:release
