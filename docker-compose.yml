@@ -1,3 +1,19 @@
+x-common-logging: &common-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+x-pocket-app: &pocket-app
+  restart: unless-stopped
+  stop_grace_period: 30s
+  expose:
+    - "8090"
+  networks:
+    - private
+    - egress
+  logging: *common-logging
+
 services:
   caddy:
     image: caddy:latest
@@ -17,137 +33,83 @@ services:
       - booklog-pocketpages
       - photofolio-pocketpages
       - homeping-pocketpages
+      - launchboard-pocketpages
       - squash-helper
     networks:
       - public
       - private
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
+    logging: *common-logging
 
   todo-pocketbase:
+    <<: *pocket-app
     image: ghcr.io/muchobien/pocketbase:latest
     container_name: todo-pocketbase
-    restart: unless-stopped
     environment:
       PB_HOST: 0.0.0.0
       PB_PORT: 8090
-      # 서버 환경변수(또는 .env)에서 주입. 미설정이면 compose가 에러로 중단함.
       GEMINI_API_KEY: ${GEMINI_API_KEY:?set GEMINI_API_KEY}
       # 초기 1회만 사용 후 제거 권장
-      #PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
-      #PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
-      # ✅ 외부에 포트 공개하지 않음 (Caddy가 내부로 프록시)
-    expose:
-      - "8090"
+      # PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
+      # PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
     volumes:
       - /path/to/todo/data:/pb_data
       - /path/to/todo/public:/pb_public
       - /path/to/todo/hooks:/pb_hooks
-      # ✅ (옵션) 마이그레이션 파일 read-only 마운트
       # - /path/to/todo/migrations:/pb_migrations:ro
-    networks:
-      - private
-      - egress
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
 
   stylemate-pocketbase:
+    <<: *pocket-app
     image: ghcr.io/muchobien/pocketbase:latest
     container_name: stylemate-pocketbase
-    restart: unless-stopped
     environment:
       PB_HOST: 0.0.0.0
       PB_PORT: 8090
-      # 서버 환경변수(또는 .env)에서 주입. 미설정이면 compose가 에러로 중단함.
       GEMINI_API_KEY: ${GEMINI_API_KEY:?set GEMINI_API_KEY}
       # 초기 1회만 사용 후 제거 권장
       # PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
       # PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
-      # ✅ 외부에 포트 공개하지 않음 (Caddy가 내부로 프록시)
-    expose:
-      - "8090"
     volumes:
       - /path/to/stylemate/data:/pb_data
       - /path/to/stylemate/public:/pb_public
       - /path/to/stylemate/hooks:/pb_hooks
-      # ✅ (옵션) 마이그레이션 파일 read-only 마운트
       # - /path/to/stylemate/migrations:/pb_migrations:ro
-    networks:
-      - private
-      - egress
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
 
   kjca-pocketpages:
+    <<: *pocket-app
     image: ghcr.io/inseok9068/kjca:release
     container_name: kjca-pocketpages
-    restart: unless-stopped
-    stop_grace_period: 30s
     environment:
       APP_ENV: production
       GEMINI_API_KEY: ${GEMINI_API_KEY:?set GEMINI_API_KEY}
       # 초기 1회만 사용 후 제거 권장
       # PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
       # PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
-    expose:
-      - "8090"
     volumes:
       - /path/to/kjca/data:/app/apps/kjca/pb_data
       - /path/to/kjca/public:/app/apps/kjca/pb_public
       - /path/to/kjca/hooks:/app/apps/kjca/pb_hooks
-      # ✅ (옵션) 마이그레이션 파일 read-only 마운트
       # - /path/to/kjca/migrations:/app/apps/kjca/pb_migrations:ro
-    networks:
-      - private
-      - egress
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
 
   sample-pocketpages:
+    <<: *pocket-app
     image: ghcr.io/inseok9068/sample:release
     container_name: sample-pocketpages
-    restart: unless-stopped
-    stop_grace_period: 30s
     environment:
       APP_ENV: production
       GEMINI_API_KEY: ${GEMINI_API_KEY:?set GEMINI_API_KEY}
       # 초기 1회만 사용 후 제거 권장
       # PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
       # PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
-    expose:
-      - "8090"
     volumes:
       - /path/to/sample/data:/app/apps/sample/pb_data
       - /path/to/sample/public:/app/apps/sample/pb_public
       - /path/to/sample/hooks:/app/apps/sample/pb_hooks
-      # ✅ (옵션) 마이그레이션 파일 read-only 마운트
       # - /path/to/sample/migrations:/app/apps/sample/pb_migrations:ro
-    networks:
-      - private
-      - egress
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
 
   booklog-pocketpages:
+    <<: *pocket-app
     image: ghcr.io/inseok9068/booklog:release
     container_name: booklog-pocketpages
-    restart: unless-stopped
-    stop_grace_period: 30s
     environment:
       APP_ENV: production
       # GEMINI_API_KEY: ${GEMINI_API_KEY:?set GEMINI_API_KEY}
@@ -157,28 +119,16 @@ services:
       # 초기 1회만 사용 후 제거 권장
       # PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
       # PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
-    expose:
-      - "8090"
     volumes:
       - /path/to/booklog/data:/app/apps/booklog/pb_data
       - /path/to/booklog/public:/app/apps/booklog/pb_public
       - /path/to/booklog/hooks:/app/apps/booklog/pb_hooks
-      # ✅ (옵션) 마이그레이션 파일 read-only 마운트
       # - /path/to/booklog/migrations:/app/apps/booklog/pb_migrations:ro
-    networks:
-      - private
-      - egress
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
 
   photofolio-pocketpages:
+    <<: *pocket-app
     image: ghcr.io/inseok9068/photofolio:release
     container_name: photofolio-pocketpages
-    restart: unless-stopped
-    stop_grace_period: 30s
     environment:
       APP_ENV: production
       GEMINI_API_KEY: ${GEMINI_API_KEY:?set GEMINI_API_KEY}
@@ -186,28 +136,16 @@ services:
       # 초기 1회만 사용 후 제거 권장
       # PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
       # PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
-    expose:
-      - "8090"
     volumes:
       - /path/to/photofolio/data:/app/apps/photofolio/pb_data
       - /path/to/photofolio/public:/app/apps/photofolio/pb_public
       - /path/to/photofolio/hooks:/app/apps/photofolio/pb_hooks
-      # ✅ (옵션) 마이그레이션 파일 read-only 마운트
       # - /path/to/photofolio/migrations:/app/apps/photofolio/pb_migrations:ro
-    networks:
-      - private
-      - egress
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
 
   homeping-pocketpages:
+    <<: *pocket-app
     image: ghcr.io/inseok9068/homeping:release
     container_name: homeping-pocketpages
-    restart: unless-stopped
-    stop_grace_period: 30s
     environment:
       APP_ENV: production
       DATAGOKR_APIKEY: ${DATAGOKR_APIKEY:?set DATAGOKR_APIKEY}
@@ -216,65 +154,37 @@ services:
       # 초기 1회만 사용 후 제거 권장
       # PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
       # PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
-    expose:
-      - "8090"
     volumes:
       - /path/to/homeping/data:/app/apps/homeping/pb_data
       - /path/to/homeping/public:/app/apps/homeping/pb_public
       - /path/to/homeping/hooks:/app/apps/homeping/pb_hooks
-      # ✅ (옵션) 마이그레이션 파일 read-only 마운트
       # - /path/to/homeping/migrations:/app/apps/homeping/pb_migrations:ro
-    networks:
-      - private
-      - egress
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
 
   launchboard-pocketpages:
+    <<: *pocket-app
     image: ghcr.io/inseok9068/launchboard:release
     container_name: launchboard-pocketpages
-    restart: unless-stopped
-    stop_grace_period: 30s
     environment:
       APP_ENV: production
       # 초기 1회만 사용 후 제거 권장
-      PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
-      PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
-    expose:
-      - "8090"
+      # PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
+      # PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
     volumes:
       - /path/to/launchboard/data:/app/apps/launchboard/pb_data
       - /path/to/launchboard/public:/app/apps/launchboard/pb_public
       - /path/to/launchboard/hooks:/app/apps/launchboard/pb_hooks
-      # ✅ (옵션) 마이그레이션 파일 read-only 마운트
       # - /path/to/launchboard/migrations:/app/apps/launchboard/pb_migrations:ro
-    networks:
-      - private
-      - egress
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
 
   squash-helper:
     container_name: squash-helper
     image: ghcr.io/inseok9068/squash-helper:release
     restart: unless-stopped
-    # ✅ 외부 포트 공개하지 않음 (Caddy가 내부로 프록시)
     expose:
       - "8080"
     networks:
       - private
       - egress
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
+    logging: *common-logging
 
 networks:
   public:
