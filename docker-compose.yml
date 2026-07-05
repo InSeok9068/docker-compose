@@ -175,6 +175,22 @@ services:
       - /path/to/launchboard/hooks:/app/apps/launchboard/pb_hooks
       # - /path/to/launchboard/migrations:/app/apps/launchboard/pb_migrations:ro
 
+  seedlab-pocketpages:
+    <<: *pocket-app
+    image: ghcr.io/inseok9068/seedlab:release
+    container_name: seedlab-pocketpages
+    environment:
+      APP_ENV: production
+      SEEDLAB_CREDENTIAL_KEY: ${SEEDLAB_CREDENTIAL_KEY:?set SEEDLAB_CREDENTIAL_KEY}
+      # 초기 1회만 사용 후 제거 권장
+      PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
+      PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
+    volumes:
+      - /path/to/seedlab/data:/app/apps/seedlab/pb_data
+      - /path/to/seedlab/public:/app/apps/seedlab/pb_public
+      - /path/to/seedlab/hooks:/app/apps/seedlab/pb_hooks
+      # - /path/to/seedlab/migrations:/app/apps/seedlab/pb_migrations:ro
+
   squash-helper:
     container_name: squash-helper
     image: ghcr.io/inseok9068/squash-helper:release

@@ -39,3 +39,7 @@ homeping.development-support.o-r.kr {
 launchboard.development-support.o-r.kr {
     reverse_proxy launchboard-pocketpages:8090
 }
+
+seedlab.development-support.o-r.kr {
+    reverse_proxy seedlab-pocketpages:8090
+}
