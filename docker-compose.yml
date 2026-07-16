@@ -195,6 +195,7 @@ services:
     container_name: squash-helper
     image: ghcr.io/inseok9068/squash-helper:release
     restart: unless-stopped
+    init: true
     expose:
       - "8080"
     networks:
