@@ -1,45 +1,67 @@
 {
-    # 전역 설정
-    email dlstjr9068@gmail.com  # Let's Encrypt SSL 인증서 발급을 위한 이메일 설정
+    # ACME 인증기관 계정 및 인증서 관련 연락처
+    email dlstjr9068@gmail.com
 }
 
-# 기본 도메인 (HTTPS 자동 적용)
+# 모든 서비스에 공통 적용할 설정
+(common) {
+    # HTML, CSS, JavaScript, JSON 등 텍스트 응답 압축
+    encode zstd gzip
+
+    # 비교적 부작용이 적은 기본 보안 헤더
+    header {
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+}
+
+# 기본 도메인
 development-support.o-r.kr {
+    import common
     reverse_proxy todo-pocketbase:8090
 }
 
 stylemate.development-support.o-r.kr {
+    import common
     reverse_proxy stylemate-pocketbase:8090
 }
 
 squash-helper.development-support.o-r.kr {
+    import common
     reverse_proxy squash-helper:8080
 }
 
 kjca.development-support.o-r.kr {
+    import common
     reverse_proxy kjca-pocketpages:8090
 }
 
 sample.development-support.o-r.kr {
+    import common
     reverse_proxy sample-pocketpages:8090
 }
 
 booklog.development-support.o-r.kr {
+    import common
     reverse_proxy booklog-pocketpages:8090
 }
 
 photofolio.development-support.o-r.kr {
+    import common
     reverse_proxy photofolio-pocketpages:8090
 }
 
 homeping.development-support.o-r.kr {
+    import common
     reverse_proxy homeping-pocketpages:8090
 }
 
 launchboard.development-support.o-r.kr {
+    import common
     reverse_proxy launchboard-pocketpages:8090
 }
 
 seedlab.development-support.o-r.kr {
+    import common
     reverse_proxy seedlab-pocketpages:8090
 }
