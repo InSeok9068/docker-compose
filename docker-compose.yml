@@ -197,6 +197,8 @@ services:
     container_name: dulkong-pocketpages
     environment:
       APP_ENV: production
+      DULKONG_ONESIGNAL_APPID: ${DULKONG_ONESIGNAL_APPID:?set DULKONG_ONESIGNAL_APPID}
+      DULKONG_ONESIGNAL_APIKEY: ${DULKONG_ONESIGNAL_APIKEY:?set DULKONG_ONESIGNAL_APIKEY}
       # 초기 1회만 사용 후 제거 권장
       PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
       PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
