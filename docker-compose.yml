@@ -183,13 +183,28 @@ services:
       APP_ENV: production
       SEEDLAB_CREDENTIAL_KEY: ${SEEDLAB_CREDENTIAL_KEY:?set SEEDLAB_CREDENTIAL_KEY}
       # 초기 1회만 사용 후 제거 권장
-      PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
-      PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
+      # PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
+      # PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
     volumes:
       - /path/to/seedlab/data:/app/apps/seedlab/pb_data
       - /path/to/seedlab/public:/app/apps/seedlab/pb_public
       - /path/to/seedlab/hooks:/app/apps/seedlab/pb_hooks
       # - /path/to/seedlab/migrations:/app/apps/seedlab/pb_migrations:ro
+
+  dulkong-pocketpages:
+    <<: *pocket-app
+    image: ghcr.io/inseok9068/dulkong:release
+    container_name: dulkong-pocketpages
+    environment:
+      APP_ENV: production
+      # 초기 1회만 사용 후 제거 권장
+      PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
+      PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
+    volumes:
+      - /path/to/dulkong/data:/app/apps/dulkong/pb_data
+      - /path/to/dulkong/public:/app/apps/dulkong/pb_public
+      - /path/to/dulkong/hooks:/app/apps/dulkong/pb_hooks
+      # - /path/to/dulkong/migrations:/app/apps/dulkong/pb_migrations:ro
 
   squash-helper:
     container_name: squash-helper

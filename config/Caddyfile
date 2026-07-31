@@ -65,3 +65,8 @@ seedlab.development-support.o-r.kr {
     import common
     reverse_proxy seedlab-pocketpages:8090
 }
+
+dulkong.development-support.o-r.kr {
+    import common
+    reverse_proxy dulkong-pocketpages:8090
+}
