@@ -70,3 +70,8 @@ dulkong.development-support.o-r.kr {
     import common
     reverse_proxy dulkong-pocketpages:8090
 }
+
+gyeolbit.development-support.o-r.kr {
+    import common
+    reverse_proxy gyeolbit-pocketpages:8090
+}

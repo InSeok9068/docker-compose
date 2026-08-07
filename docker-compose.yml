@@ -208,6 +208,21 @@ services:
       - /path/to/dulkong/hooks:/app/apps/dulkong/pb_hooks
       # - /path/to/dulkong/migrations:/app/apps/dulkong/pb_migrations:ro
 
+  gyeolbit-pocketpages:
+    <<: *pocket-app
+    image: ghcr.io/inseok9068/gyeolbit:release
+    container_name: gyeolbit-pocketpages
+    environment:
+      APP_ENV: production
+      # 초기 1회만 사용 후 제거 권장
+      # PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
+      # PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
+    volumes:
+      - /path/to/gyeolbit/data:/app/apps/gyeolbit/pb_data
+      - /path/to/gyeolbit/public:/app/apps/gyeolbit/pb_public
+      - /path/to/gyeolbit/hooks:/app/apps/gyeolbit/pb_hooks
+      # - /path/to/gyeolbit/migrations:/app/apps/gyeolbit/pb_migrations:ro
+
   squash-helper:
     container_name: squash-helper
     image: ghcr.io/inseok9068/squash-helper:release
