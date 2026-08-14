@@ -34,6 +34,9 @@ services:
       - photofolio-pocketpages
       - homeping-pocketpages
       - launchboard-pocketpages
+      - seedlab-pocketpages
+      - dulkong-pocketpages
+      - gyeolbit-pocketpages
       - squash-helper
     networks:
       - public
@@ -200,8 +203,8 @@ services:
       DULKONG_ONESIGNAL_APPID: ${DULKONG_ONESIGNAL_APPID:?set DULKONG_ONESIGNAL_APPID}
       DULKONG_ONESIGNAL_APIKEY: ${DULKONG_ONESIGNAL_APIKEY:?set DULKONG_ONESIGNAL_APIKEY}
       # 초기 1회만 사용 후 제거 권장
-      PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
-      PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
+      # PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
+      # PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
     volumes:
       - /path/to/dulkong/data:/app/apps/dulkong/pb_data
       - /path/to/dulkong/public:/app/apps/dulkong/pb_public
