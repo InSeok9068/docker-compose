@@ -46,3 +46,38 @@ docker compose up -d --force-recreate kjca-pocketpages
 ```shell
 curl -sSL get.docker.com | sh
 ```
+
+## 서비스 은퇴
+
+### 1. Compose / Caddy 설정 제거
+
+- `docker-compose.yml`
+  - 해당 서비스 정의 제거
+  - `caddy.depends_on`에서 제거
+
+- `Caddyfile`
+  - 해당 서비스 도메인 및 `reverse_proxy` 제거
+
+### 2. 기존 컨테이너 제거
+
+```shell
+docker compose up -d --remove-orphans
+```
+
+### 3. 서비스 데이터 삭제
+
+```shell
+rm -rf /path/to/{service}
+```
+
+> `pb_data` 등 필요한 데이터가 없는지 확인 후 삭제
+
+### 4. 잔여 설정 정리
+
+- `.env` 전용 환경변수 제거
+- 사용하지 않는 DNS 레코드 제거
+- 필요 시 Docker 이미지 정리
+
+```shell
+docker system prune -a
+```
