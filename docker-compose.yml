@@ -43,6 +43,21 @@ services:
       - private
     logging: *common-logging
 
+  beszel:
+    image: henrygd/beszel:latest
+    container_name: beszel
+    restart: unless-stopped
+    environment:
+      APP_URL: https://monitor.development-support.o-r.kr
+    expose:
+      - "8090"
+    volumes:
+      - ./app/beszel/data:/beszel_data
+      - ./app/beszel/socket:/beszel_socket
+    networks:
+      - private
+    logging: *common-logging
+
   todo-pocketbase:
     <<: *pocket-app
     image: ghcr.io/muchobien/pocketbase:latest

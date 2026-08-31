@@ -22,6 +22,11 @@ development-support.o-r.kr {
     reverse_proxy todo-pocketbase:8090
 }
 
+monitor.development-support.o-r.kr {
+    import common
+    reverse_proxy beszel:8090
+}
+
 stylemate.development-support.o-r.kr {
     import common
     reverse_proxy stylemate-pocketbase:8090
