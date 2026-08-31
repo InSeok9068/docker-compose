@@ -1,12 +1,11 @@
 {
-    # ACME 인증기관 계정 및 인증서 관련 연락처
     email dlstjr9068@gmail.com
 }
 
 # 모든 서비스에 공통 적용할 설정
 (common) {
     # HTML, CSS, JavaScript, JSON 등 텍스트 응답 압축
-    encode zstd gzip
+    encode
 
     # 비교적 부작용이 적은 기본 보안 헤더
     header {
