@@ -58,6 +58,22 @@ services:
       - private
     logging: *common-logging
 
+  beszel-agent:
+    image: henrygd/beszel-agent:latest
+    container_name: beszel-agent
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./app/beszel/agent-data:/var/lib/beszel-agent
+      - ./app/beszel/socket:/beszel_socket
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      LISTEN: /beszel_socket/beszel.sock
+      HUB_URL: https://monitor.development-support.o-r.kr
+      TOKEN: "${BESZEL_TOKEN:?set BESZEL_TOKEN}"
+      KEY: "${BESZEL_KEY:?set BESZEL_KEY}"
+    logging: *common-logging
+
   todo-pocketbase:
     <<: *pocket-app
     image: ghcr.io/muchobien/pocketbase:latest
