@@ -16,7 +16,7 @@ x-pocket-app: &pocket-app
 
 services:
   caddy:
-    image: caddy:latest
+    image: caddy:2
     container_name: caddy
     restart: unless-stopped
     ports:
@@ -24,20 +24,7 @@ services:
       - "443:443"
     volumes:
       - ./app/caddy:/data
-      - ./config/Caddyfile:/etc/caddy/Caddyfile:ro
-    depends_on:
-      - todo-pocketbase
-      - stylemate-pocketbase
-      - kjca-pocketpages
-      - sample-pocketpages
-      - booklog-pocketpages
-      - photofolio-pocketpages
-      - homeping-pocketpages
-      - launchboard-pocketpages
-      - seedlab-pocketpages
-      - dulkong-pocketpages
-      - gyeolbit-pocketpages
-      - squash-helper
+      - ./config/caddy:/etc/caddy:ro
     networks:
       - public
       - private

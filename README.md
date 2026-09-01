@@ -53,7 +53,6 @@ curl -sSL get.docker.com | sh
 
 - `docker-compose.yml`
   - 해당 서비스 정의 제거
-  - `caddy.depends_on`에서 제거
 
 - `Caddyfile`
   - 해당 서비스 도메인 및 `reverse_proxy` 제거
