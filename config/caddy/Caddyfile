@@ -87,7 +87,7 @@ rss.development-support.o-r.kr {
     reverse_proxy freshrss:80
 }
 
-rss.development-support.o-r.kr {
+rssbridge.development-support.o-r.kr {
     import common
 
     basic_auth {
