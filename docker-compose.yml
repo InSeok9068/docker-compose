@@ -1,3 +1,7 @@
+##############################
+# Common Configuration
+##############################
+
 x-common-logging: &common-logging
   driver: "json-file"
   options:
@@ -15,6 +19,10 @@ x-pocket-app: &pocket-app
   logging: *common-logging
 
 services:
+  ##############################
+  # Core Infrastructure
+  ##############################
+
   caddy:
     image: caddy:2
     container_name: caddy
@@ -61,6 +69,10 @@ services:
       TOKEN: "${BESZEL_TOKEN:?set BESZEL_TOKEN}"
       KEY: "${BESZEL_KEY:?set BESZEL_KEY}"
     logging: *common-logging
+
+  ##############################
+  # PocketBase / PocketPages Apps
+  ##############################
 
   todo-pocketbase:
     <<: *pocket-app
@@ -245,6 +257,10 @@ services:
       - /path/to/gyeolbit/hooks:/app/apps/gyeolbit/pb_hooks
       # - /path/to/gyeolbit/migrations:/app/apps/gyeolbit/pb_migrations:ro
 
+  ##############################
+  # Utility Services
+  ##############################
+
   squash-helper:
     container_name: squash-helper
     image: ghcr.io/inseok9068/squash-helper:release
@@ -257,9 +273,57 @@ services:
       - egress
     logging: *common-logging
 
+  ##############################
+  # Personal Services
+  ##############################
+
+  freshrss:
+    image: freshrss/freshrss:latest
+    container_name: freshrss
+    restart: unless-stopped
+    expose:
+      - "80"
+    environment:
+      TZ: Asia/Seoul
+
+      # RSS 자동 갱신
+      # 매시 7분, 37분 → 약 30분 간격
+      CRON_MIN: "7,37"
+
+      # FreshRSS에서 내부 RSS-Bridge에 접근 허용
+      INTERNAL_HOST_ALLOWLIST: "rss-bridge:80"
+
+    volumes:
+      - ./app/freshrss/data:/var/www/FreshRSS/data
+      - ./app/freshrss/extensions:/var/www/FreshRSS/extensions
+    networks:
+      - private
+      - egress
+    logging: *common-logging
+
+  rss-bridge:
+    image: rssbridge/rss-bridge:latest
+    container_name: rss-bridge
+    restart: unless-stopped
+    expose:
+      - "80"
+    volumes:
+      - ./app/rss-bridge/config:/config
+    networks:
+      - private
+      - egress
+    logging: *common-logging
+
+##############################
+# Networks
+##############################
+
 networks:
   public:
+
   private:
     internal: true
-  # Outbound(egress) is allowed on this network. Attach services that must call external APIs.
+
+  # Outbound(egress) is allowed on this network.
+  # Attach services that must call external APIs.
   egress:

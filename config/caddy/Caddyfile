@@ -81,3 +81,8 @@ gyeolbit.development-support.o-r.kr {
     import common
     reverse_proxy gyeolbit-pocketpages:8090
 }
+
+rss.development-support.o-r.kr {
+    import common
+    reverse_proxy freshrss:80
+}
