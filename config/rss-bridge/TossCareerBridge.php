@@ -5,6 +5,7 @@ declare(strict_types=1);
 class TossCareerBridge extends BridgeAbstract
 {
     const NAME = 'Toss Career - Backend';
+
     const URI = 'https://toss.im/career/jobs'
         . '?employment_type=%EC%A0%95%EA%B7%9C%EC%A7%81'
         . '&category=engineering-product%2Cengineering-platform%2Cengineering-product-platform%2Cqa%2Cengineering'
@@ -12,35 +13,40 @@ class TossCareerBridge extends BridgeAbstract
         . '&sub_category=Backend';
 
     const DESCRIPTION =
-        '토스 커뮤니티의 현재 채용 중인 정규직 Engineering > Backend 포지션';
+        '토스 커뮤니티의 현재 정규직 Engineering > Backend 포지션';
 
-    // FreshRSS가 30분 간격으로 확인하므로 동일하게 30분
     const CACHE_TIMEOUT = 1800;
 
     private const API_URL =
-        'https://api-public.toss.im/api/v3/ipd-eggnog/career/jobs';
+        'https://api-public.toss.im/api/v3/ipd-eggnog/career/job-groups';
+
+    private const EMPLOYMENT_METADATA = 'Employment_Type';
+
+    private const CATEGORY_METADATA =
+        '커리어 페이지 노출 Job Category 값을 선택해주세요';
 
     private const EMPLOYMENT_TYPE = '정규직';
-    private const MAIN_CATEGORY = 'Engineering';
-    private const SUB_CATEGORY = 'Backend';
+    private const CATEGORY = 'Backend';
 
     public function collectData()
     {
-        $headers = [
-            'Accept: application/json',
-            'Referer: https://toss.im/career',
-        ];
-
         $response = getContents(
             self::API_URL,
-            $headers
+            [
+                'Accept: application/json',
+                'Referer: https://toss.im/career',
+                'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
+                    . 'AppleWebKit/605.1.15 (KHTML, like Gecko) '
+                    . 'Version/17.6 Safari/605.1.15',
+            ]
         );
 
         $data = json_decode($response, true);
 
         if (!is_array($data)) {
             throwServerException(
-                'Toss Career API 응답을 JSON으로 읽지 못했습니다.'
+                'Toss Career API 응답을 JSON으로 읽지 못했습니다: '
+                . json_last_error_msg()
             );
         }
 
@@ -50,435 +56,435 @@ class TossCareerBridge extends BridgeAbstract
             );
         }
 
-        $jobs = $data['success'] ?? [];
+        $groups = $data['success'] ?? null;
 
-        if (!is_array($jobs)) {
+        if (!is_array($groups)) {
             throwServerException(
-                'Toss Career API에서 채용공고 목록을 찾지 못했습니다.'
+                'Toss Career API에서 job group 목록을 찾지 못했습니다.'
             );
         }
 
-        foreach ($jobs as $job) {
-            if (!is_array($job)) {
+        $observedCategories = [];
+        $matchedGroups = 0;
+
+        foreach ($groups as $group) {
+            if (!is_array($group)) {
                 continue;
+            }
+
+            $jobs = $this->getJobsFromGroup($group);
+
+            if ($jobs === []) {
+                continue;
+            }
+
+            $matchingJobs = [];
+
+            foreach ($jobs as $job) {
+                $metadata = $this->getMetadata($job);
+
+                $employmentType =
+                    $this->getEmploymentType($metadata);
+
+                $category =
+                    $this->getCareerCategory($metadata);
+
+                /*
+                 * 디버깅용:
+                 * 정규직 공고에 어떤 Category 값이 실제로 있는지
+                 * 0건일 경우 에러 메시지에 보여준다.
+                 */
+                if (
+                    $this->valueMatches(
+                        $employmentType,
+                        self::EMPLOYMENT_TYPE
+                    )
+                ) {
+                    foreach (
+                        $this->flattenValues($category)
+                        as $value
+                    ) {
+                        $value = trim($value);
+
+                        if ($value !== '') {
+                            $observedCategories[$value] = true;
+                        }
+                    }
+                }
+
+                /*
+                 * 정규직만
+                 */
+                if (
+                    !$this->valueMatches(
+                        $employmentType,
+                        self::EMPLOYMENT_TYPE
+                    )
+                ) {
+                    continue;
+                }
+
+                /*
+                 * Toss Career UI의 Backend Category만
+                 */
+                if (
+                    !$this->valueMatches(
+                        $category,
+                        self::CATEGORY
+                    )
+                ) {
+                    continue;
+                }
+
+                $matchingJobs[] = $job;
             }
 
             /*
-             * Toss Career API의 success 배열은
-             * 현재 공개된 채용공고 목록이다.
-             *
-             * 그중 명시적으로 마감일이 지난 공고가 남아 있다면
-             * 한 번 더 제외한다.
+             * 이 그룹에 Backend + 정규직 공고가 하나도 없으면 제외
              */
-            if (!$this->isOpen($job)) {
+            if ($matchingJobs === []) {
                 continue;
             }
 
-            /*
-             * 정규직만
-             */
-            if (!$this->isFullTime($job)) {
-                continue;
-            }
-
-            /*
-             * Engineering > Backend만.
-             *
-             * 제목이나 기술스택으로 추측하지 않고
-             * Toss가 내려주는 구조화된 category 필드만 확인한다.
-             */
-            if (!$this->isEngineeringBackend($job)) {
-                continue;
-            }
-
-            $item = $this->makeItem($job);
+            $item = $this->buildGroupItem(
+                $group,
+                $matchingJobs
+            );
 
             if ($item !== null) {
                 $this->items[] = $item;
+                $matchedGroups++;
             }
         }
 
         /*
-         * 최근 등록 공고 우선
+         * 이전 코드처럼 조용히 0개를 반환하지 않는다.
+         *
+         * 만약 Toss가 metadata 값을 바꿨다면
+         * 실제 값이 에러 화면에 바로 표시된다.
+         */
+        if ($matchedGroups === 0) {
+            $categories =
+                array_keys($observedCategories);
+
+            natcasesort($categories);
+
+            $message =
+                'Toss API 호출은 성공했지만 '
+                . '정규직 Backend 그룹이 0개입니다.';
+
+            if ($categories !== []) {
+                $message .=
+                    ' 현재 정규직 공고에서 확인된 '
+                    . 'Job Category 값: '
+                    . implode(
+                        ' | ',
+                        array_slice(
+                            array_values($categories),
+                            0,
+                            50
+                        )
+                    );
+            } else {
+                $message .=
+                    ' 정규직 공고의 Job Category '
+                    . 'metadata도 확인되지 않았습니다.';
+            }
+
+            throwServerException($message);
+        }
+
+        /*
+         * 최근 등록된 공고가 있는 그룹부터
          */
         usort(
             $this->items,
-            static function (array $a, array $b): int {
-                return ($b['timestamp'] ?? 0)
-                    <=> ($a['timestamp'] ?? 0);
+            static function (
+                array $a,
+                array $b
+            ): int {
+                return
+                    ($b['timestamp'] ?? 0)
+                    <=>
+                    ($a['timestamp'] ?? 0);
             }
         );
     }
 
     /**
-     * 정규직 여부
+     * Toss UI의 한 행 = 하나의 job group.
+     *
+     * 한 그룹 안에 같은 직무명의 여러 계열사 공고가
+     * jobs[] 형태로 들어있다.
      */
-    private function isFullTime(array $job): bool
-    {
-        $metadata = $this->getMetadata($job);
+    private function getJobsFromGroup(
+        array $group
+    ): array {
+        $jobs = $group['jobs'] ?? [];
 
-        $employmentType =
-            $this->findMetadataValue(
-                $metadata,
-                [
-                    'Employment_Type',
-                    'Employment Type',
-                    'employment_type',
-                ]
+        if (
+            is_array($jobs)
+            && $jobs !== []
+        ) {
+            return array_values(
+                array_filter(
+                    $jobs,
+                    static fn ($job): bool =>
+                        is_array($job)
+                )
             );
+        }
 
-        return $this->equals(
-            $employmentType,
-            self::EMPLOYMENT_TYPE
-        );
+        /*
+         * 구조 변경 등에 대비한 fallback
+         */
+        $primaryJob =
+            $group['primary_job'] ?? null;
+
+        if (is_array($primaryJob)) {
+            return [$primaryJob];
+        }
+
+        return [];
     }
 
     /**
-     * Engineering > Backend 여부
-     *
-     * Toss 내부 필드명이 변경될 가능성을 고려해
-     * 여러 일반적인 category 키를 지원한다.
-     *
-     * 중요한 점:
-     * title, description, 기술스택으로 Backend를 추측하지 않는다.
+     * 하나의 Toss UI 포지션 그룹을
+     * RSS item 하나로 만든다.
      */
-    private function isEngineeringBackend(array $job): bool
-    {
-        $metadata = $this->getMetadata($job);
+    private function buildGroupItem(
+        array $group,
+        array $matchingJobs
+    ): ?array {
+        $primaryJob =
+            $group['primary_job'] ?? null;
 
         /*
-         * 1. 가장 명확한 main/sub category 형태 확인
+         * primary_job 자체가 현재 필터와 맞지 않는다면
+         * 실제 matching job 중 첫 번째를 대표로 사용.
          */
-        $mainCategory = $this->findCategoryValue(
-            $job,
-            $metadata,
-            [
-                'main_category',
-                'mainCategory',
-                'Main Category',
-                'Main_Category',
-                'Job Main Category',
-            ]
-        );
-
-        $subCategory = $this->findCategoryValue(
-            $job,
-            $metadata,
-            [
-                'sub_category',
-                'subCategory',
-                'Sub Category',
-                'Sub_Category',
-                'Job Sub Category',
-            ]
-        );
-
         if (
-            $this->containsCategory(
-                $mainCategory,
-                self::MAIN_CATEGORY
-            )
-            &&
-            $this->containsCategory(
-                $subCategory,
-                self::SUB_CATEGORY
-            )
+            !is_array($primaryJob)
+            ||
+            !$this->isMatchingJob($primaryJob)
         ) {
-            return true;
+            $primaryJob =
+                $matchingJobs[0] ?? null;
         }
 
-        /*
-         * 2. 일부 API에서는 하나의 Job Category에
-         *    계층형 값을 넣을 수도 있으므로 확인
-         *
-         * 예:
-         * Engineering > Backend
-         * Engineering / Backend
-         * ["Engineering", "Backend"]
-         */
-        $jobCategory = $this->findMetadataValue(
-            $metadata,
-            [
-                'Job Category',
-                'Job_Category',
-                'job_category',
-                'Category',
-            ]
-        );
-
-        if (
-            $this->containsCategory(
-                $jobCategory,
-                self::MAIN_CATEGORY
-            )
-            &&
-            $this->containsCategory(
-                $jobCategory,
-                self::SUB_CATEGORY
-            )
-        ) {
-            return true;
+        if (!is_array($primaryJob)) {
+            return null;
         }
 
-        /*
-         * 3. metadata 배열 자체에
-         *    Main/Sub Category 계열 이름이 있는지 확인
-         */
-        $foundMain = false;
-        $foundSub = false;
-
-        foreach ($metadata as $name => $value) {
-            $normalizedName =
-                $this->normalizeKey((string) $name);
-
-            if (
-                strpos(
-                    $normalizedName,
-                    'maincategory'
-                ) !== false
-                &&
-                $this->containsCategory(
-                    $value,
-                    self::MAIN_CATEGORY
-                )
-            ) {
-                $foundMain = true;
-            }
-
-            if (
-                strpos(
-                    $normalizedName,
-                    'subcategory'
-                ) !== false
-                &&
-                $this->containsCategory(
-                    $value,
-                    self::SUB_CATEGORY
-                )
-            ) {
-                $foundSub = true;
-            }
-        }
-
-        if ($foundMain && $foundSub) {
-            return true;
-        }
-
-        /*
-         * 4. job 객체의 category 관련 필드를 재귀적으로 확인.
-         *
-         * 이것도 "category"라는 구조화된 필드만 대상으로 하며
-         * title/description/skills는 검사하지 않는다.
-         */
-        $categoryData =
-            $this->collectCategoryFields($job);
-
-        $foundEngineering = false;
-        $foundBackend = false;
-
-        foreach ($categoryData as $value) {
-            if (
-                $this->containsCategory(
-                    $value,
-                    self::MAIN_CATEGORY
-                )
-            ) {
-                $foundEngineering = true;
-            }
-
-            if (
-                $this->containsCategory(
-                    $value,
-                    self::SUB_CATEGORY
-                )
-            ) {
-                $foundBackend = true;
-            }
-        }
-
-        return $foundEngineering && $foundBackend;
-    }
-
-    /**
-     * 이미 마감된 공고 제외
-     *
-     * deadline이 없는 경우:
-     * Toss API의 현재 공개 목록에 포함되어 있으므로 열린 것으로 본다.
-     */
-    private function isOpen(array $job): bool
-    {
-        $deadline = trim(
-            (string) (
-                $job['application_deadline']
-                ?? ''
-            )
-        );
-
-        if ($deadline === '') {
-            return true;
-        }
-
-        /*
-         * 상시/채용시 등의 표현
-         */
-        $rollingWords = [
-            '상시',
-            '수시',
-            '채용시',
-            'open until filled',
-        ];
-
-        foreach ($rollingWords as $word) {
-            if (
-                stripos(
-                    $deadline,
-                    $word
-                ) !== false
-            ) {
-                return true;
-            }
-        }
-
-        /*
-         * ISO 날짜나 일반적인 날짜라면 strtotime 처리
-         */
-        $timestamp = strtotime($deadline);
-
-        if ($timestamp === false) {
-            /*
-             * 해석할 수 없는 deadline은
-             * Toss 공개 목록의 상태를 우선 신뢰
-             */
-            return true;
-        }
-
-        /*
-         * 오늘까지는 열린 것으로 처리
-         */
-        return $timestamp >= strtotime('today');
-    }
-
-    /**
-     * RSS Item 생성
-     */
-    private function makeItem(array $job): ?array
-    {
         $title = trim(
-            (string) ($job['title'] ?? '')
-        );
-
-        if ($title === '') {
-            return null;
-        }
-
-        $url = $this->getJobUrl($job);
-
-        if ($url === '') {
-            return null;
-        }
-
-        $company = trim(
             (string) (
-                $job['company_name']
-                ?? '토스'
-            )
-        );
-
-        $location =
-            $this->getLocation($job);
-
-        $metadata =
-            $this->getMetadata($job);
-
-        $employmentType =
-            $this->findMetadataValue(
-                $metadata,
-                [
-                    'Employment_Type',
-                    'Employment Type',
-                    'employment_type',
-                ]
-            );
-
-        $jobCategory =
-            $this->findMetadataValue(
-                $metadata,
-                [
-                    'Job Category',
-                    'Job_Category',
-                    'job_category',
-                ]
-            );
-
-        $firstPublished = trim(
-            (string) (
-                $job['first_published']
+                $primaryJob['title']
                 ?? ''
             )
         );
 
-        $deadline = trim(
+        $uri = trim(
             (string) (
-                $job['application_deadline']
+                $primaryJob['absolute_url']
                 ?? ''
             )
         );
 
-        $timestamp = null;
+        if (
+            $title === ''
+            || $uri === ''
+        ) {
+            return null;
+        }
 
-        if ($firstPublished !== '') {
-            $parsed =
-                strtotime($firstPublished);
+        $companies = [];
+        $locations = [];
+        $deadlines = [];
+        $links = [];
 
-            if ($parsed !== false) {
-                $timestamp = $parsed;
+        $latestTimestamp = 0;
+
+        foreach ($matchingJobs as $job) {
+            /*
+             * 회사
+             */
+            $company = trim(
+                (string) (
+                    $job['company_name']
+                    ?? ''
+                )
+            );
+
+            if ($company === '') {
+                $metadata =
+                    $this->getMetadata($job);
+
+                $company =
+                    $this->valueToString(
+                        $this->findMetadataValue(
+                            $metadata,
+                            '포지션의 소속 자회사를 선택해 주세요.'
+                        )
+                    );
+            }
+
+            if ($company !== '') {
+                $companies[] = $company;
+            }
+
+            /*
+             * 근무지
+             */
+            $location =
+                $this->getLocation($job);
+
+            if ($location !== '') {
+                $locations[] = $location;
+            }
+
+            /*
+             * 마감일
+             */
+            $deadline =
+                $this->getDeadline($job);
+
+            if ($deadline !== '') {
+                $deadlines[] = $deadline;
+            }
+
+            /*
+             * 그룹 안의 실제 개별 공고 링크
+             */
+            $jobUrl = trim(
+                (string) (
+                    $job['absolute_url']
+                    ?? ''
+                )
+            );
+
+            if ($jobUrl !== '') {
+                $links[] = [
+                    'company' =>
+                        $company !== ''
+                            ? $company
+                            : '공고',
+
+                    'url' => $jobUrl,
+                ];
+            }
+
+            /*
+             * 그룹 내 가장 최근 등록일
+             */
+            $firstPublished = trim(
+                (string) (
+                    $job['first_published']
+                    ?? ''
+                )
+            );
+
+            if ($firstPublished !== '') {
+                $timestamp =
+                    strtotime($firstPublished);
+
+                if ($timestamp !== false) {
+                    $latestTimestamp = max(
+                        $latestTimestamp,
+                        $timestamp
+                    );
+                }
             }
         }
 
-        $id =
-            $job['id']
-            ?? $job['gh_jid']
-            ?? null;
+        $companies =
+            array_values(
+                array_unique($companies)
+            );
 
-        $uid = $id !== null
-            ? 'toss-career-' . (string) $id
-            : 'toss-career-' . sha1($url);
+        $locations =
+            array_values(
+                array_unique($locations)
+            );
+
+        $deadlines =
+            array_values(
+                array_unique($deadlines)
+            );
 
         $item = [
-            'uid' => $uid,
+            /*
+             * Toss 화면이 동일 제목을 한 행으로 묶으므로
+             * 대표 회사가 바뀌더라도 UID가 유지되도록
+             * title 기반으로 만든다.
+             */
+            'uid' =>
+                'toss-backend-'
+                . sha1($title),
+
             'title' => $title,
-            'uri' => $url,
-            'author' => $company,
-            'content' => $this->buildContent(
-                $company,
-                $location,
-                $employmentType,
-                $jobCategory,
-                $firstPublished,
-                $deadline
-            ),
+
+            'uri' => $uri,
+
+            'author' =>
+                $companies !== []
+                    ? implode(', ', $companies)
+                    : 'Toss',
+
+            'content' =>
+                $this->buildContent(
+                    $companies,
+                    $locations,
+                    $deadlines,
+                    $links,
+                    count($matchingJobs)
+                ),
         ];
 
-        if ($timestamp !== null) {
+        if ($latestTimestamp > 0) {
             $item['timestamp'] =
-                $timestamp;
+                $latestTimestamp;
         }
 
         return $item;
     }
 
+    private function isMatchingJob(
+        array $job
+    ): bool {
+        $metadata =
+            $this->getMetadata($job);
+
+        return
+            $this->valueMatches(
+                $this->getEmploymentType(
+                    $metadata
+                ),
+                self::EMPLOYMENT_TYPE
+            )
+            &&
+            $this->valueMatches(
+                $this->getCareerCategory(
+                    $metadata
+                ),
+                self::CATEGORY
+            );
+    }
+
     /**
-     * metadata를
+     * metadata:
      *
      * [
-     *   "Employment_Type" => "정규직",
-     *   "Job Category" => ...
+     *   [
+     *     "name" => "...",
+     *     "value" => "..."
+     *   ]
      * ]
      *
-     * 형태로 변환
+     * 를 name => value 형태로 변환.
      */
-    private function getMetadata(array $job): array
-    {
+    private function getMetadata(
+        array $job
+    ): array {
         $result = [];
 
         $metadata =
@@ -511,26 +517,67 @@ class TossCareerBridge extends BridgeAbstract
         return $result;
     }
 
-    /**
-     * metadata에서 여러 후보 이름으로 값 조회
-     */
+    private function getEmploymentType(
+        array $metadata
+    ) {
+        return $this->findMetadataValue(
+            $metadata,
+            self::EMPLOYMENT_METADATA
+        );
+    }
+
+    private function getCareerCategory(
+        array $metadata
+    ) {
+        /*
+         * Toss가 현재 Career UI 노출용으로 쓰는
+         * 정확한 metadata 이름.
+         */
+        $value =
+            $this->findMetadataValue(
+                $metadata,
+                self::CATEGORY_METADATA
+            );
+
+        if ($value !== null) {
+            return $value;
+        }
+
+        /*
+         * 이름이 조금 변경되었을 경우에만
+         * 제한적으로 fallback.
+         */
+        foreach (
+            $metadata
+            as $name => $candidate
+        ) {
+            if (
+                stripos(
+                    (string) $name,
+                    'Job Category'
+                ) !== false
+            ) {
+                return $candidate;
+            }
+        }
+
+        return null;
+    }
+
     private function findMetadataValue(
         array $metadata,
-        array $names
+        string $wantedName
     ) {
-        foreach ($metadata as $key => $value) {
-            foreach ($names as $name) {
-                if (
-                    $this->normalizeKey(
-                        (string) $key
-                    )
-                    ===
-                    $this->normalizeKey(
-                        (string) $name
-                    )
-                ) {
-                    return $value;
-                }
+        foreach (
+            $metadata
+            as $name => $value
+        ) {
+            if (
+                trim((string) $name)
+                ===
+                $wantedName
+            ) {
+                return $value;
             }
         }
 
@@ -538,152 +585,83 @@ class TossCareerBridge extends BridgeAbstract
     }
 
     /**
-     * job 최상위 / metadata에서 category 값 조회
+     * metadata value가
+     * 문자열 / 배열 어느 형태로 와도 처리.
      */
-    private function findCategoryValue(
-        array $job,
-        array $metadata,
-        array $names
-    ) {
-        foreach ($job as $key => $value) {
-            foreach ($names as $name) {
-                if (
-                    $this->normalizeKey(
-                        (string) $key
-                    )
-                    ===
-                    $this->normalizeKey(
-                        (string) $name
-                    )
-                ) {
-                    return $value;
-                }
+    private function valueMatches(
+        $value,
+        string $expected
+    ): bool {
+        foreach (
+            $this->flattenValues($value)
+            as $candidate
+        ) {
+            $candidate =
+                trim($candidate);
+
+            if ($candidate === '') {
+                continue;
             }
-        }
 
-        return $this->findMetadataValue(
-            $metadata,
-            $names
-        );
-    }
-
-    /**
-     * category 이름을 가진 필드만 재귀 수집
-     *
-     * title, description, content 등은 검사하지 않는다.
-     */
-    private function collectCategoryFields(
-        array $data
-    ): array {
-        $result = [];
-
-        foreach ($data as $key => $value) {
-            $normalizedKey =
-                $this->normalizeKey(
-                    (string) $key
-                );
-
-            $isCategoryKey =
-                strpos(
-                    $normalizedKey,
-                    'category'
-                ) !== false;
-
-            if ($isCategoryKey) {
-                $result[] = $value;
+            if (
+                strcasecmp(
+                    $candidate,
+                    $expected
+                ) === 0
+            ) {
+                return true;
             }
 
             /*
-             * metadata 등 구조 내부도 확인
+             * ["Backend"] 형태가
+             * 문자열로 내려오는 경우.
              */
-            if (is_array($value)) {
-                $children =
-                    $this->collectCategoryFields(
-                        $value
+            if (
+                ($candidate[0] ?? '') === '['
+                ||
+                ($candidate[0] ?? '') === '{'
+            ) {
+                $decoded =
+                    json_decode(
+                        $candidate,
+                        true
                     );
 
-                foreach ($children as $child) {
-                    $result[] = $child;
-                }
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * 문자열/배열/객체 안에 특정 category가 존재하는지 확인
-     */
-    private function containsCategory(
-        $value,
-        string $needle
-    ): bool {
-        if ($value === null) {
-            return false;
-        }
-
-        if (is_array($value)) {
-            foreach ($value as $child) {
                 if (
-                    $this->containsCategory(
-                        $child,
-                        $needle
+                    is_array($decoded)
+                    &&
+                    $this->valueMatches(
+                        $decoded,
+                        $expected
                     )
                 ) {
                     return true;
                 }
             }
 
-            return false;
-        }
+            /*
+             * 혹시
+             * Engineering > Backend
+             * Backend, Infra
+             *
+             * 같은 형태일 경우.
+             */
+            $parts =
+                preg_split(
+                    '/\s*[,>\/|;]+\s*/u',
+                    $candidate
+                );
 
-        if (is_object($value)) {
-            return $this->containsCategory(
-                (array) $value,
-                $needle
-            );
-        }
-
-        if (!is_scalar($value)) {
-            return false;
-        }
-
-        $text = trim(
-            (string) $value
-        );
-
-        if ($text === '') {
-            return false;
-        }
-
-        /*
-         * 단일 값
-         */
-        if ($this->equals($text, $needle)) {
-            return true;
-        }
-
-        /*
-         * 계층형 / 다중 category 문자열
-         *
-         * Engineering > Backend
-         * Engineering / Backend
-         * Engineering, Backend
-         */
-        $parts = preg_split(
-            '/[\s]*[>,\/|;]+[\s]*/u',
-            $text
-        );
-
-        if (is_array($parts)) {
-            foreach ($parts as $part) {
-                if (
-                    $this->equals(
-                        trim($part),
-                        $needle
-                    )
-                ) {
-                    return true;
+            if (is_array($parts)) {
+                foreach ($parts as $part) {
+                    if (
+                        strcasecmp(
+                            trim($part),
+                            $expected
+                        ) === 0
+                    ) {
+                        return true;
+                    }
                 }
             }
         }
@@ -691,34 +669,35 @@ class TossCareerBridge extends BridgeAbstract
         return false;
     }
 
-    private function equals(
-        $left,
-        $right
-    ): bool {
-        if (
-            !is_scalar($left)
-            ||
-            !is_scalar($right)
-        ) {
-            return false;
+    private function flattenValues(
+        $value
+    ): array {
+        if ($value === null) {
+            return [];
         }
 
-        return strcasecmp(
-            trim((string) $left),
-            trim((string) $right)
-        ) === 0;
-    }
+        if (is_scalar($value)) {
+            return [
+                (string) $value
+            ];
+        }
 
-    private function normalizeKey(
-        string $value
-    ): string {
-        return strtolower(
-            preg_replace(
-                '/[^a-zA-Z0-9]+/',
-                '',
-                $value
-            )
-        );
+        if (!is_array($value)) {
+            return [];
+        }
+
+        $result = [];
+
+        foreach ($value as $child) {
+            foreach (
+                $this->flattenValues($child)
+                as $text
+            ) {
+                $result[] = $text;
+            }
+        }
+
+        return $result;
     }
 
     private function getLocation(
@@ -745,162 +724,145 @@ class TossCareerBridge extends BridgeAbstract
         return '';
     }
 
-    private function getJobUrl(
+    private function getDeadline(
         array $job
     ): string {
-        $absoluteUrl = trim(
+        $metadata =
+            $this->getMetadata($job);
+
+        /*
+         * Toss 자체 클로징 일자 metadata 우선
+         */
+        $customDeadline =
+            $this->findMetadataValue(
+                $metadata,
+                '커리어페이지 채용공고 클로징 일자 '
+                . '(서류접수 마감일이 정해진 경우)'
+            );
+
+        $customDeadlineText =
+            $this->valueToString(
+                $customDeadline
+            );
+
+        if ($customDeadlineText !== '') {
+            return $customDeadlineText;
+        }
+
+        return trim(
             (string) (
-                $job['absolute_url']
+                $job['application_deadline']
                 ?? ''
             )
         );
-
-        if ($absoluteUrl !== '') {
-            return $absoluteUrl;
-        }
-
-        $id =
-            $job['gh_jid']
-            ?? $job['id']
-            ?? null;
-
-        if ($id === null) {
-            return '';
-        }
-
-        return
-            'https://toss.im/career/job-detail?gh_jid='
-            . rawurlencode(
-                (string) $id
-            );
-    }
-
-    private function buildContent(
-        string $company,
-        string $location,
-        $employmentType,
-        $jobCategory,
-        string $firstPublished,
-        string $deadline
-    ): string {
-        $rows = [];
-
-        $rows[] = [
-            '회사',
-            $company,
-        ];
-
-        if (
-            is_scalar($employmentType)
-            &&
-            trim((string) $employmentType) !== ''
-        ) {
-            $rows[] = [
-                '고용형태',
-                (string) $employmentType,
-            ];
-        }
-
-        if ($jobCategory !== null) {
-            $categoryText =
-                $this->valueToString(
-                    $jobCategory
-                );
-
-            if ($categoryText !== '') {
-                $rows[] = [
-                    '직군',
-                    $categoryText,
-                ];
-            }
-        }
-
-        if ($location !== '') {
-            $rows[] = [
-                '근무지',
-                $location,
-            ];
-        }
-
-        if ($firstPublished !== '') {
-            $rows[] = [
-                '등록일',
-                $this->formatDate(
-                    $firstPublished
-                ),
-            ];
-        }
-
-        if ($deadline !== '') {
-            $rows[] = [
-                '마감',
-                $deadline,
-            ];
-        }
-
-        $html = '<div>';
-
-        foreach ($rows as $row) {
-            $html .= '<p>';
-            $html .= '<strong>'
-                . $this->escape($row[0])
-                . ':</strong> ';
-            $html .=
-                $this->escape($row[1]);
-            $html .= '</p>';
-        }
-
-        $html .= '</div>';
-
-        return $html;
     }
 
     private function valueToString(
         $value
     ): string {
-        if (is_scalar($value)) {
-            return trim(
-                (string) $value
-            );
-        }
+        $values = [];
 
-        if (is_array($value)) {
-            $values = [];
+        foreach (
+            $this->flattenValues($value)
+            as $text
+        ) {
+            $text = trim($text);
 
-            foreach ($value as $child) {
-                $text =
-                    $this->valueToString(
-                        $child
-                    );
-
-                if ($text !== '') {
-                    $values[] = $text;
-                }
+            if ($text !== '') {
+                $values[] = $text;
             }
-
-            return implode(
-                ', ',
-                array_unique($values)
-            );
         }
 
-        return '';
+        return implode(
+            ', ',
+            array_values(
+                array_unique($values)
+            )
+        );
     }
 
-    private function formatDate(
-        string $value
+    private function buildContent(
+        array $companies,
+        array $locations,
+        array $deadlines,
+        array $links,
+        int $positionCount
     ): string {
-        $timestamp =
-            strtotime($value);
+        $html = '<div>';
 
-        if ($timestamp === false) {
-            return $value;
+        $html .=
+            '<p><strong>직군:</strong> Backend</p>';
+
+        $html .=
+            '<p><strong>고용형태:</strong> 정규직</p>';
+
+        if ($companies !== []) {
+            $html .=
+                '<p><strong>소속:</strong> '
+                . $this->escape(
+                    implode(
+                        ', ',
+                        $companies
+                    )
+                )
+                . '</p>';
         }
 
-        return date(
-            'Y-m-d',
-            $timestamp
-        );
+        if ($positionCount > 1) {
+            $html .=
+                '<p><strong>현재 세부 공고:</strong> '
+                . $positionCount
+                . '개</p>';
+        }
+
+        if ($locations !== []) {
+            $html .=
+                '<p><strong>근무지:</strong> '
+                . $this->escape(
+                    implode(
+                        ', ',
+                        $locations
+                    )
+                )
+                . '</p>';
+        }
+
+        if ($deadlines !== []) {
+            $html .=
+                '<p><strong>마감:</strong> '
+                . $this->escape(
+                    implode(
+                        ', ',
+                        $deadlines
+                    )
+                )
+                . '</p>';
+        }
+
+        if ($links !== []) {
+            $html .=
+                '<p><strong>세부 공고</strong></p>'
+                . '<ul>';
+
+            foreach ($links as $link) {
+                $html .=
+                    '<li><a href="'
+                    . $this->escape(
+                        (string) $link['url']
+                    )
+                    . '">'
+                    . $this->escape(
+                        (string) $link['company']
+                    )
+                    . '</a></li>';
+            }
+
+            $html .= '</ul>';
+        }
+
+        $html .= '</div>';
+
+        return $html;
     }
 
     private function escape(
