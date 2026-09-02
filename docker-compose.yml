@@ -27,6 +27,8 @@ services:
     image: caddy:2
     container_name: caddy
     restart: unless-stopped
+    environment:
+      RSS_BRIDGE_PASSWORD_HASH: ${RSS_BRIDGE_PASSWORD_HASH:?set RSS_BRIDGE_PASSWORD_HASH}
     ports:
       - "80:80"
       - "443:443"

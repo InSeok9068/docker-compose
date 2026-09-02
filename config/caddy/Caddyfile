@@ -86,3 +86,13 @@ rss.development-support.o-r.kr {
     import common
     reverse_proxy freshrss:80
 }
+
+rss.development-support.o-r.kr {
+    import common
+
+    basic_auth {
+        admin {$RSS_BRIDGE_PASSWORD_HASH}
+    }
+
+    reverse_proxy rss-bridge:80
+}
