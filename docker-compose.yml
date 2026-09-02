@@ -310,7 +310,7 @@ services:
     expose:
       - "80"
     volumes:
-      - ./app/rss-bridge/config:/config
+      - ./config/rss-bridge:/config
     networks:
       - private
       - egress
