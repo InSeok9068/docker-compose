@@ -15,7 +15,7 @@ class TossCareerBridge extends BridgeAbstract
     const DESCRIPTION =
         '토스 커뮤니티의 현재 정규직 Engineering > Backend 포지션';
 
-    const CACHE_TIMEOUT = 1800;
+    const CACHE_TIMEOUT = 0;
 
     private const API_URL =
         'https://api-public.toss.im/api/v3/ipd-eggnog/career/job-groups';
