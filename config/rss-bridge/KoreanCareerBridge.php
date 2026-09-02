@@ -46,6 +46,21 @@ class KoreanCareerBridge extends BridgeAbstract
         return self::COMPANIES[$this->getInput('company')][1] ?? self::URI;
     }
 
+    public function getIcon()
+    {
+        // BridgeAbstract uses the fixed URI constant; select each site's official icon instead.
+        return match ($this->getInput('company')) {
+            'naver' => 'https://recruit.navercorp.com/share/tmplat/naver/img/og/naver_favicon_24.ico',
+            'kakao' => 'https://t1.daumcdn.net/comis/common/images/favicon_64x64.ico',
+            'daangn' => 'https://careers.daangn.com/favicon-48x48.png',
+            'line' => 'https://careers.linecorp.com/favicon-32x32.png',
+            'coupang' => 'https://www.coupang.jobs/favicon.ico',
+            'woowahan' => 'https://career.woowahan.com/favicon.ico',
+            'toss' => 'https://static.toss.im/tds/favicon/favicon-32x32.png',
+            default => '',
+        };
+    }
+
     public function getDiagnostics(): array
     {
         return $this->diagnostics;
