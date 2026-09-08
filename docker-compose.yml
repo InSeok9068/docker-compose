@@ -124,7 +124,6 @@ services:
       - /path/to/kjca/data:/app/apps/kjca/pb_data
       - /path/to/kjca/public:/app/apps/kjca/pb_public
       - /path/to/kjca/hooks:/app/apps/kjca/pb_hooks
-      # - /path/to/kjca/migrations:/app/apps/kjca/pb_migrations:ro
 
   sample-pocketpages:
     <<: *pocket-app
@@ -140,7 +139,6 @@ services:
       - /path/to/sample/data:/app/apps/sample/pb_data
       - /path/to/sample/public:/app/apps/sample/pb_public
       - /path/to/sample/hooks:/app/apps/sample/pb_hooks
-      # - /path/to/sample/migrations:/app/apps/sample/pb_migrations:ro
 
   booklog-pocketpages:
     <<: *pocket-app
@@ -159,7 +157,6 @@ services:
       - /path/to/booklog/data:/app/apps/booklog/pb_data
       - /path/to/booklog/public:/app/apps/booklog/pb_public
       - /path/to/booklog/hooks:/app/apps/booklog/pb_hooks
-      # - /path/to/booklog/migrations:/app/apps/booklog/pb_migrations:ro
 
   photofolio-pocketpages:
     <<: *pocket-app
@@ -176,7 +173,6 @@ services:
       - /path/to/photofolio/data:/app/apps/photofolio/pb_data
       - /path/to/photofolio/public:/app/apps/photofolio/pb_public
       - /path/to/photofolio/hooks:/app/apps/photofolio/pb_hooks
-      # - /path/to/photofolio/migrations:/app/apps/photofolio/pb_migrations:ro
 
   homeping-pocketpages:
     <<: *pocket-app
@@ -194,7 +190,6 @@ services:
       - /path/to/homeping/data:/app/apps/homeping/pb_data
       - /path/to/homeping/public:/app/apps/homeping/pb_public
       - /path/to/homeping/hooks:/app/apps/homeping/pb_hooks
-      # - /path/to/homeping/migrations:/app/apps/homeping/pb_migrations:ro
 
   launchboard-pocketpages:
     <<: *pocket-app
@@ -209,7 +204,6 @@ services:
       - /path/to/launchboard/data:/app/apps/launchboard/pb_data
       - /path/to/launchboard/public:/app/apps/launchboard/pb_public
       - /path/to/launchboard/hooks:/app/apps/launchboard/pb_hooks
-      # - /path/to/launchboard/migrations:/app/apps/launchboard/pb_migrations:ro
 
   seedlab-pocketpages:
     <<: *pocket-app
@@ -225,7 +219,6 @@ services:
       - /path/to/seedlab/data:/app/apps/seedlab/pb_data
       - /path/to/seedlab/public:/app/apps/seedlab/pb_public
       - /path/to/seedlab/hooks:/app/apps/seedlab/pb_hooks
-      # - /path/to/seedlab/migrations:/app/apps/seedlab/pb_migrations:ro
 
   dulkong-pocketpages:
     <<: *pocket-app
@@ -242,7 +235,6 @@ services:
       - /path/to/dulkong/data:/app/apps/dulkong/pb_data
       - /path/to/dulkong/public:/app/apps/dulkong/pb_public
       - /path/to/dulkong/hooks:/app/apps/dulkong/pb_hooks
-      # - /path/to/dulkong/migrations:/app/apps/dulkong/pb_migrations:ro
 
   gyeolbit-pocketpages:
     <<: *pocket-app
@@ -257,7 +249,6 @@ services:
       - /path/to/gyeolbit/data:/app/apps/gyeolbit/pb_data
       - /path/to/gyeolbit/public:/app/apps/gyeolbit/pb_public
       - /path/to/gyeolbit/hooks:/app/apps/gyeolbit/pb_hooks
-      # - /path/to/gyeolbit/migrations:/app/apps/gyeolbit/pb_migrations:ro
 
   ##############################
   # Utility Services
