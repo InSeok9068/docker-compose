@@ -250,6 +250,20 @@ services:
       - /path/to/gyeolbit/public:/app/apps/gyeolbit/pb_public
       - /path/to/gyeolbit/hooks:/app/apps/gyeolbit/pb_hooks
 
+  homepocket-pocketpages:
+    <<: *pocket-app
+    image: ghcr.io/inseok9068/homepocket:release
+    container_name: homepocket-pocketpages
+    environment:
+      APP_ENV: production
+      # 초기 1회만 사용 후 제거 권장
+      PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
+      PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
+    volumes:
+      - /path/to/homepocket/data:/app/apps/homepocket/pb_data
+      - /path/to/homepocket/public:/app/apps/homepocket/pb_public
+      - /path/to/homepocket/hooks:/app/apps/homepocket/pb_hooks
+
   ##############################
   # Utility Services
   ##############################
