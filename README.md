@@ -17,7 +17,7 @@ docker compose pull && docker compose up -d --remove-orphans
 ## 도커 불필요한 자원 정리
 
 ```shell
-docker system prune -a
+docker system prune -a -f
 ```
 
 ## 도커 컴포즈에 정의되지 않는 서비스 제외
