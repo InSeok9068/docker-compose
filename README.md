@@ -4,6 +4,16 @@
 
 이미지가 `arm64v8` 호환하는지 확인
 
+## 우분투 서버 패치 및 도커 이미지 최신 업데이트
+
+```shell
+sudo apt update && sudo apt upgrade -y && sudo apt autoremove -y && sudo apt autoclean && sudo reboot
+```
+
+```shell
+docker compose pull && docker compose up -d --remove-orphans
+```
+
 ## 도커 불필요한 자원 정리
 
 ```shell
