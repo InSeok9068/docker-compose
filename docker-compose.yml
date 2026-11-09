@@ -18,6 +18,15 @@ x-pocket-app: &pocket-app
     - egress
   logging: *common-logging
 
+x-pocketpages-app: &pocketpages-app
+  <<: *pocket-app
+  healthcheck:
+    test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8090/api/health"]
+    interval: 10s
+    timeout: 3s
+    retries: 6
+    start_period: 20s
+
 services:
   ##############################
   # Core Infrastructure
@@ -111,7 +120,7 @@ services:
       # - /path/to/stylemate/migrations:/pb_migrations:ro
 
   kjca-pocketpages:
-    <<: *pocket-app
+    <<: *pocketpages-app
     image: ghcr.io/inseok9068/kjca:release
     container_name: kjca-pocketpages
     environment:
@@ -126,7 +135,7 @@ services:
       - /path/to/kjca/hooks:/app/apps/kjca/pb_hooks
 
   sample-pocketpages:
-    <<: *pocket-app
+    <<: *pocketpages-app
     image: ghcr.io/inseok9068/sample:release
     container_name: sample-pocketpages
     environment:
@@ -141,7 +150,7 @@ services:
       - /path/to/sample/hooks:/app/apps/sample/pb_hooks
 
   booklog-pocketpages:
-    <<: *pocket-app
+    <<: *pocketpages-app
     image: ghcr.io/inseok9068/booklog:release
     container_name: booklog-pocketpages
     environment:
@@ -162,7 +171,7 @@ services:
       - /path/to/booklog/hooks:/app/apps/booklog/pb_hooks
 
   photofolio-pocketpages:
-    <<: *pocket-app
+    <<: *pocketpages-app
     image: ghcr.io/inseok9068/photofolio:release
     container_name: photofolio-pocketpages
     environment:
@@ -178,7 +187,7 @@ services:
       - /path/to/photofolio/hooks:/app/apps/photofolio/pb_hooks
 
   homeping-pocketpages:
-    <<: *pocket-app
+    <<: *pocketpages-app
     image: ghcr.io/inseok9068/homeping:release
     container_name: homeping-pocketpages
     environment:
@@ -195,7 +204,7 @@ services:
       - /path/to/homeping/hooks:/app/apps/homeping/pb_hooks
 
   launchboard-pocketpages:
-    <<: *pocket-app
+    <<: *pocketpages-app
     image: ghcr.io/inseok9068/launchboard:release
     container_name: launchboard-pocketpages
     environment:
@@ -209,7 +218,7 @@ services:
       - /path/to/launchboard/hooks:/app/apps/launchboard/pb_hooks
 
   seedlab-pocketpages:
-    <<: *pocket-app
+    <<: *pocketpages-app
     image: ghcr.io/inseok9068/seedlab:release
     container_name: seedlab-pocketpages
     environment:
@@ -224,7 +233,7 @@ services:
       - /path/to/seedlab/hooks:/app/apps/seedlab/pb_hooks
 
   dulkong-pocketpages:
-    <<: *pocket-app
+    <<: *pocketpages-app
     image: ghcr.io/inseok9068/dulkong:release
     container_name: dulkong-pocketpages
     environment:
@@ -240,7 +249,7 @@ services:
       - /path/to/dulkong/hooks:/app/apps/dulkong/pb_hooks
 
   gyeolbit-pocketpages:
-    <<: *pocket-app
+    <<: *pocketpages-app
     image: ghcr.io/inseok9068/gyeolbit:release
     container_name: gyeolbit-pocketpages
     environment:
@@ -254,7 +263,7 @@ services:
       - /path/to/gyeolbit/hooks:/app/apps/gyeolbit/pb_hooks
 
   homepocket-pocketpages:
-    <<: *pocket-app
+    <<: *pocketpages-app
     image: ghcr.io/inseok9068/homepocket:release
     container_name: homepocket-pocketpages
     environment:
