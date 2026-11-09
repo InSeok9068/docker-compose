@@ -1,103 +1,103 @@
 {
-    email dlstjr9068@gmail.com
+	email dlstjr9068@gmail.com
 }
 
 # 모든 서비스에 공통 적용할 설정
 (common) {
-    # HTML, CSS, JavaScript, JSON 등 텍스트 응답 압축
-    encode
+	# HTML, CSS, JavaScript, JSON 등 텍스트 응답 압축
+	encode
 
-    # 비교적 부작용이 적은 기본 보안 헤더
-    header {
-        X-Frame-Options "SAMEORIGIN"
-        X-Content-Type-Options "nosniff"
-        Strict-Transport-Security "max-age=31536000"
-        Referrer-Policy "strict-origin-when-cross-origin"
-    }
+	# 비교적 부작용이 적은 기본 보안 헤더
+	header {
+		X-Frame-Options "SAMEORIGIN"
+		X-Content-Type-Options "nosniff"
+		Strict-Transport-Security "max-age=31536000"
+		Referrer-Policy "strict-origin-when-cross-origin"
+	}
 }
 
 # 기본 도메인
 development-support.o-r.kr {
-    import common
-    reverse_proxy todo-pocketbase:8090
+	import common
+	reverse_proxy todo-pocketbase:8090
 }
 
 monitor.development-support.o-r.kr {
-    import common
-    reverse_proxy beszel:8090
+	import common
+	reverse_proxy beszel:8090
 }
 
 stylemate.development-support.o-r.kr {
-    import common
-    reverse_proxy stylemate-pocketbase:8090
+	import common
+	reverse_proxy stylemate-pocketbase:8090
 }
 
 squash-helper.development-support.o-r.kr {
-    import common
-    reverse_proxy squash-helper:8080
+	import common
+	reverse_proxy squash-helper:8080
 }
 
 kjca.development-support.o-r.kr {
-    import common
-    reverse_proxy kjca-pocketpages:8090
+	import common
+	reverse_proxy kjca-pocketpages:8090
 }
 
 sample.development-support.o-r.kr {
-    import common
-    reverse_proxy sample-pocketpages:8090
+	import common
+	reverse_proxy sample-pocketpages:8090
 }
 
 booklog.development-support.o-r.kr {
-    import common
-    reverse_proxy booklog-pocketpages:8090
+	import common
+	reverse_proxy booklog-pocketpages:8090
 }
 
 photofolio.development-support.o-r.kr {
-    import common
-    reverse_proxy photofolio-pocketpages:8090
+	import common
+	reverse_proxy photofolio-pocketpages:8090
 }
 
 homeping.development-support.o-r.kr {
-    import common
-    reverse_proxy homeping-pocketpages:8090
+	import common
+	reverse_proxy homeping-pocketpages:8090
 }
 
 launchboard.development-support.o-r.kr {
-    import common
-    reverse_proxy launchboard-pocketpages:8090
+	import common
+	reverse_proxy launchboard-pocketpages:8090
 }
 
 seedlab.development-support.o-r.kr {
-    import common
-    reverse_proxy seedlab-pocketpages:8090
+	import common
+	reverse_proxy seedlab-pocketpages:8090
 }
 
 dulkong.development-support.o-r.kr {
-    import common
-    reverse_proxy dulkong-pocketpages:8090
+	import common
+	reverse_proxy dulkong-pocketpages:8090
 }
 
 gyeolbit.development-support.o-r.kr {
-    import common
-    reverse_proxy gyeolbit-pocketpages:8090
+	import common
+	reverse_proxy gyeolbit-pocketpages:8090
 }
 
 homepocket.development-support.o-r.kr {
-    import common
-    reverse_proxy homepocket-pocketpages:8090
+	import common
+	reverse_proxy homepocket-pocketpages:8090
 }
 
 rss.development-support.o-r.kr {
-    import common
-    reverse_proxy freshrss:80
+	import common
+	reverse_proxy freshrss:80
 }
 
 rssbridge.development-support.o-r.kr {
-    import common
+	import common
 
-    basic_auth {
-        admin {$RSS_BRIDGE_PASSWORD_HASH}
-    }
+	basic_auth {
+		admin {$RSS_BRIDGE_PASSWORD_HASH}
+	}
 
-    reverse_proxy rss-bridge:80
+	reverse_proxy rss-bridge:80
 }
