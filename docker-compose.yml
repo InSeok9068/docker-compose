@@ -21,7 +21,15 @@ x-pocket-app: &pocket-app
 x-pocketpages-app: &pocketpages-app
   <<: *pocket-app
   healthcheck:
-    test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8090/api/health"]
+    test:
+      [
+        "CMD",
+        "wget",
+        "-q",
+        "-O",
+        "/dev/null",
+        "http://127.0.0.1:8090/api/health",
+      ]
     interval: 10s
     timeout: 3s
     retries: 6
@@ -162,6 +170,7 @@ services:
       ONESIGNAL_APPID: ${ONESIGNAL_APPID:?set ONESIGNAL_APPID}
       ONESIGNAL_APIKEY: ${ONESIGNAL_APIKEY:?set ONESIGNAL_APIKEY}
       BOOKLOG_TTS_MODEL: ${BOOKLOG_TTS_MODEL:?set BOOKLOG_TTS_MODEL}
+      BOOKLOG_EPUB_SOURCE_URL: ${BOOKLOG_EPUB_SOURCE_URL:?set BOOKLOG_EPUB_SOURCE_URL}
       # 초기 1회만 사용 후 제거 권장
       # PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
       # PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
