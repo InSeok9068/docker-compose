@@ -14,81 +14,99 @@
 		Strict-Transport-Security "max-age=31536000"
 		Referrer-Policy "strict-origin-when-cross-origin"
 	}
+}
 
+# 최소 CSP (앱이 자체 CSP를 보내면 앱 설정 우선)
+(csp) {
 	header ?Content-Security-Policy "object-src 'none'; base-uri 'self'; frame-ancestors 'self'"
 }
 
 # 기본 도메인
 development-support.o-r.kr {
 	import common
+	import csp
 	reverse_proxy todo-pocketbase:8090
 }
 
 monitor.development-support.o-r.kr {
 	import common
+	import csp
 	reverse_proxy beszel:8090
 }
 
 stylemate.development-support.o-r.kr {
 	import common
+	import csp
 	reverse_proxy stylemate-pocketbase:8090
 }
 
 squash-helper.development-support.o-r.kr {
 	import common
+	import csp
 	reverse_proxy squash-helper:8080
 }
 
 kjca.development-support.o-r.kr {
 	import common
+	import csp
 	reverse_proxy kjca-pocketpages:8090
 }
 
 sample.development-support.o-r.kr {
 	import common
+	import csp
 	reverse_proxy sample-pocketpages:8090
 }
 
 booklog.development-support.o-r.kr {
 	import common
+	import csp
 	reverse_proxy booklog-pocketpages:8090
 }
 
 photofolio.development-support.o-r.kr {
 	import common
+	import csp
 	reverse_proxy photofolio-pocketpages:8090
 }
 
 homeping.development-support.o-r.kr {
 	import common
+	import csp
 	reverse_proxy homeping-pocketpages:8090
 }
 
 launchboard.development-support.o-r.kr {
 	import common
+	import csp
 	reverse_proxy launchboard-pocketpages:8090
 }
 
 seedlab.development-support.o-r.kr {
 	import common
+	import csp
 	reverse_proxy seedlab-pocketpages:8090
 }
 
 dulkong.development-support.o-r.kr {
 	import common
+	import csp
 	reverse_proxy dulkong-pocketpages:8090
 }
 
 gyeolbit.development-support.o-r.kr {
 	import common
+	import csp
 	reverse_proxy gyeolbit-pocketpages:8090
 }
 
 homepocket.development-support.o-r.kr {
 	import common
+	import csp
 	reverse_proxy homepocket-pocketpages:8090
 }
 
+# FreshRSS는 자체 CSP 사용 (커스텀 JS 때문에 csp 제외)
 rss.development-support.o-r.kr {
 	import common
 	reverse_proxy freshrss:80
@@ -96,6 +114,7 @@ rss.development-support.o-r.kr {
 
 rssbridge.development-support.o-r.kr {
 	import common
+	import csp
 
 	basic_auth {
 		admin {$RSS_BRIDGE_PASSWORD_HASH}
